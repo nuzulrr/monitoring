@@ -1,860 +1,338 @@
 <!doctype html>
 <html lang="en">
-  <!-- [Head] start -->
-
   <head>
-    <title>Home | Datta able Dashboard Template</title>
-    <!-- [Meta] -->
+    <title>MTT Live Monitor Project Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="description"
-      content="Datta able is trending dashboard template made using Bootstrap 5 design framework. Datta able is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
-    />
-    <meta
-      name="keywords"
-      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
-    />
+    <meta name="description" content="Datta able is trending dashboard template made using Bootstrap 5 design framework." />
+    <meta name="keywords" content="Bootstrap admin template, Dashboard UI Kit" />
     <meta name="author" content="Codedthemes" />
 
-    <!-- [Favicon] icon -->
     <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
- <!-- [Font] Family -->
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<!-- [phosphor Icons] https://phosphoricons.com/ -->
-<link rel="stylesheet" href="../assets/fonts/phosphor/regular/style.css" />
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
-<link rel="stylesheet" href="../assets/css/style-preset.css" />
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-14K1GBX9FG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-  gtag('js', new Date());
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/fonts/phosphor/regular/style.css" />
+    <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link rel="stylesheet" href="../assets/css/style-preset.css" />
+    
+    <style>
+      /* Custom Styling to match the screenshot exactly */
+      body {
+        background-color: #1a1a1c !important;
+      }
+      .pc-header {
+        background-color: #121213 !important;
+        left: 0 !important; /* Remove sidebar offset */
+        border-bottom: 1px solid #2a2a2a;
+      }
+      .pc-container {
+        margin-left: 0 !important; /* Remove sidebar offset */
+        padding-top: 30px;
+      }
+      .top-nav-btn {
+        background-color: transparent;
+        color: #a0a0a0;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 5px 15px;
+        font-size: 13px;
+        margin-right: 8px;
+      }
+      .top-nav-btn.active {
+        background-color: #a81c1c;
+        color: #fff;
+        border-color: #a81c1c;
+      }
+      .search-bar {
+        background-color: transparent;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #fff;
+        padding: 5px 15px 5px 35px;
+        font-size: 13px;
+      }
+      .search-icon-wrapper {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+      }
+      .card-dark-custom {
+        background-color: #212123;
+        border: 1px solid #333;
+        border-radius: 10px;
+      }
+      .status-pill {
+        height: 18px;
+        width: 65px;
+        border-radius: 6px;
+        display: inline-block;
+      }
+      .status-pill.danger { background-color: #b72b2b; }
+      .status-pill.success { background-color: #23cc38; }
+      
+      .table-ip th {
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 13px;
+        border-bottom: none;
+      }
+      .table-ip td {
+        color: #d1d1d1;
+        font-size: 13px;
+        vertical-align: middle;
+        border-top: 1px solid #2a2a2a;
+      }
+      
+      .map-btn {
+        background-color: transparent;
+        color: #a0a0a0;
+        border: none;
+        font-size: 13px;
+        padding: 5px 10px;
+      }
+      .map-btn.active {
+        color: #fff;
+      }
+      
+      .status-ring {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+      }
+      .status-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
+      .ring-success { background-color: #d2f4d6; }
+      .dot-success { background-color: #1ab82c; }
+      .ring-danger { background-color: #f4d2d2; }
+      .dot-danger { background-color: #b81a1a; }
 
-  gtag('config', 'G-14K1GBX9FG');
-</script>
-<!-- WiserNotify -->
-<script>
-  !(function () {
-    if (window.t4hto4) console.log('WiserNotify pixel installed multiple time in this page');
-    else {
-      window.t4hto4 = !0;
-      var t = document,
-        e = window,
-        n = function () {
-          var e = t.createElement('script');
-          (e.type = 'text/javascript'),
-            (e.async = !0),
-            (e.src = 'https://pt.wisernotify.com/pixel.js?ti=1jclj6jkfc4hhry'),
-            document.body.appendChild(e);
-        };
-      'complete' === t.readyState ? n() : window.attachEvent ? e.attachEvent('onload', n) : e.addEventListener('load', n, !1);
-    }
-  })();
-</script>
-<!-- Microsoft clarity -->
-<script type="text/javascript">
-  (function (c, l, a, r, i, t, y) {
-    c[a] =
-      c[a] ||
-      function () {
-        (c[a].q = c[a].q || []).push(arguments);
-      };
-    t = l.createElement(r);
-    t.async = 1;
-    t.src = 'https://www.clarity.ms/tag/' + i;
-    y = l.getElementsByTagName(r)[0];
-    y.parentNode.insertBefore(t, y);
-  })(window, document, 'clarity', 'script', 'gkn6wuhrtb');
-</script>
-
+      /* TAMBAHAN KODE: Style untuk tombol Add Site & Add Project */
+      .btn-add-action {
+        background-color: #23cc38; /* Warna hijau default */
+        color: #fff;
+        border: 1px solid #23cc38;
+        border-radius: 6px;
+        padding: 5px 15px;
+        font-size: 13px;
+        margin-right: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      .btn-add-action:hover {
+        background-color: #1ea32d;
+        border-color: #1ea32d;
+      }
+      .btn-add-action.active {
+        background-color: #000000; /* Warna hitam saat aktif */
+        border-color: #000000;
+        color: #fff;
+      }
+    </style>
   </head>
-  <!-- [Head] end -->
-  <!-- [Body] Start -->
-
-  <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" data-pc-theme="light">
-    <!-- [ Pre-loader ] start -->
-<div class="loader-bg">
-  <div class="loader-track">
-    <div class="loader-fill"></div>
-  </div>
-</div>
-<!-- [ Pre-loader ] End -->
-@include('layouts.sidebar')
- <!-- [ Header Topbar ] start -->
-<header class="pc-header">
-  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
-<div class="me-auto pc-mob-drp">
-  <ul class="list-unstyled">
-    <li class="pc-h-item pc-sidebar-collapse">
-      <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
-        <i class="ph ph-list"></i>
-      </a>
-    </li>
-    <li class="pc-h-item pc-sidebar-popup">
-      <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
-        <i class="ph ph-list"></i>
-      </a>
-    </li>
-    <li class="dropdown pc-h-item">
-      <a
-        class="pc-head-link dropdown-toggle arrow-none m-0 trig-drp-search"
-        data-bs-toggle="dropdown"
-        href="#"
-        role="button"
-        aria-haspopup="false"
-        aria-expanded="false"
-      >
-        <i class="ph ph-magnifying-glass"></i>
-      </a>
-      <div class="dropdown-menu pc-h-dropdown drp-search">
-        <form class="px-3 py-2">
-          <input type="search" class="form-control border-0 shadow-none" placeholder="Search here. . ." />
-        </form>
+  <body data-pc-theme="dark">
+    <div class="loader-bg">
+      <div class="loader-track">
+        <div class="loader-fill"></div>
       </div>
-    </li>
-  </ul>
-</div>
-<!-- [Mobile Media Block end] -->
-<div class="ms-auto">
-  <ul class="list-unstyled">
-    <li class="dropdown pc-h-item">
-      <a
-        class="pc-head-link dropdown-toggle arrow-none me-0"
-        data-bs-toggle="dropdown"
-        href="#"
-        role="button"
-        aria-haspopup="false"
-        aria-expanded="false"
-      >
-        <i class="ph ph-bell"></i>
-        <span class="badge bg-success pc-h-badge">3</span>
-      </a>
-      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-header d-flex align-items-center justify-content-between">
-          <h5 class="m-0">Notifications</h5>
-          <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
-        </div>
-        <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-          <p class="text-span">Today</p>
-          <div class="card bg-transparent mb-0">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <img class="img-radius avatar rounded-0" src="../assets/images/user/avatar-1.png" alt="Generic placeholder image" />
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 min ago</span>
-                  <h5 class="text-body mb-2">UI/UX Design</h5>
-                  <p class="mb-0">
-                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card bg-transparent mb-0">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <img class="img-radius avatar rounded-0" src="../assets/images/user/avatar-2.png" alt="Generic placeholder image" />
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">1 hour ago</span>
-                  <h5 class="text-body mb-2">Message</h5>
-                  <p class="mb-0">Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="text-span">Yesterday</p>
-          <div class="card bg-transparent mb-0">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <img class="img-radius avatar rounded-0" src="../assets/images/user/avatar-3.png" alt="Generic placeholder image" />
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 hour ago</span>
-                  <h5 class="text-body mb-2">Forms</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card bg-transparent mb-0">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <img class="img-radius avatar rounded-0" src="../assets/images/user/avatar-4.png" alt="Generic placeholder image" />
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">12 hour ago</span>
-                  <h5 class="text-body mb-2">Challenge invitation</h5>
-                  <p class="mb-2"><span class="text-dark">Jonny aber</span> invites to join the challenge</p>
-                  <button class="btn btn-sm btn-outline-secondary me-2">Decline</button>
-                  <button class="btn btn-sm btn-primary">Accept</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card bg-transparent mb-0">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <img class="img-radius avatar rounded-0" src="../assets/images/user/avatar-5.png" alt="Generic placeholder image" />
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">5 hour ago</span>
-                  <h5 class="text-body mb-2">Security</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p
-                  >
-                </div>
-              </div>
-            </div>
+    </div>
+    <header class="pc-header">
+      <div class="header-wrapper d-flex justify-content-between align-items-center px-4 w-100">
+        
+        <div class="d-flex align-items-center">
+          <div class="logo me-4 d-flex align-items-center">
+              <img src="{{ asset('assets/images/application/logop.png') }}" 
+                  alt="Logo" 
+                  style="height: 40px; width: auto;">
           </div>
         </div>
-        <div class="text-center py-2">
-          <a href="#!" class="link-danger">Clear all Notifications</a>
+
+        <div class="d-flex align-items-center">
+          <span id="live-clock" 
+              class=" fs-6 me-4 d-none d-xl-block" 
+              style="font-size: 13px !important;">
+        </span>
+        <div class="me-4 rounded-circle bg-dark d-flex align-items-center justify-content-center" 
+            style="width: 32px; height: 32px; border: 1px solid #333; overflow: hidden;">
+            
+            <img src="{{ asset('assets/images/application/user.png') }}" 
+                alt="User" 
+                style="width: 100%; height: 100%; object-fit: cover;">
         </div>
+        </div>
+
       </div>
-    </li>
-    <li class="dropdown pc-h-item header-user-profile">
-      <a
-        class="pc-head-link dropdown-toggle arrow-none me-0"
-        data-bs-toggle="dropdown"
-        href="#"
-        role="button"
-        aria-haspopup="false"
-        data-bs-auto-close="outside"
-        aria-expanded="false"
-      >
-        <i class="ph ph-user-circle"></i>
-      </a>
-      <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown p-0 overflow-hidden">
-        <div class="dropdown-header d-flex align-items-center justify-content-between bg-primary">
-          <div class="d-flex my-2">
-            <div class="flex-shrink-0">
-              <img src="../assets/images/user/avatar-2.png" alt="user-image" class="user-avatar wid-35" />
-            </div>
-            <div class="flex-grow-1 ms-3">
-              <h6 class="text-white mb-1">Carson Darrin 🖖</h6>
-              <span class="text-white text-opacity-75">carson.darrin@company.io</span>
-            </div>
-          </div>
-        </div>
-        <div class="dropdown-body">
-          <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
-            <a href="#" class="dropdown-item">
-              <span>
-                <i class="ph ph-gear align-middle me-2"></i>
-                <span>Settings</span>
-              </span>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <i class="ph ph-share-network align-middle me-2"></i>
-                <span>Share</span>
-              </span>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <i class="ph ph-lock-key align-middle me-2"></i>
-                <span>Change Password</span>
-              </span>
-            </a>
-            <div class="d-grid my-2">
-              <button class="btn btn-primary"> <i class="ph ph-sign-out align-middle me-2"></i>Logout </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </li>
-  </ul>
-</div>
- </div>
-</header>
-<!-- [ Header ] end -->
-
-
-
-    <!-- [ Main Content ] start -->
+    </header>
     <div class="pc-container">
+      
       <div class="pc-content">
-        <!-- [ breadcrumb ] start -->
-        <div class="page-header">
-          <div class="page-block">
-            <div class="row align-items-center">
-              <div class="col-md-12">
-                <div class="page-header-title">
-                  <h5 class="mb-0">Home</h5>
+              <div class="card-header border-0 pb-0">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-2">
+                  <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="top-nav-btn active">All Project</button>
+                    <button type="button" class="top-nav-btn">Next G</button>
+                    <button type="button" class="top-nav-btn">NARA</button>
+                    <button type="button" class="top-nav-btn">NARO</button>
+                    <button type="button" class="top-nav-btn">CITICON</button>
+                  </div>
+                  <div class="ms-2 ps-3 d-flex">
+                    <button type="button" class="btn-add-action" onclick="this.classList.toggle('active')">
+                        <i class="ph ph-plus me-1"></i> Add Site Location
+                    </button>
+                    <button type="button" class="btn-add-action" onclick="this.classList.toggle('active')">
+                        <i class="ph ph-plus me-1"></i> Add Project
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-12">
-                <ul class="breadcrumb mb-0">
-                  <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
-                  <li class="breadcrumb-item"><a href="javascript: void(0)">Dashboard</a></li>
-                  <li class="breadcrumb-item" aria-current="page">Home</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- [ breadcrumb ] end -->
 
-        <!-- [ Main Content ] start -->
+              </div>
+              
         <div class="row">
-          <!-- [ daily sales section ] start -->
-          <div class="col-md-6 col-xl-4">
-            <div class="card">
-              <div class="card-body">
-                <h6 class="mb-4">Daily Sales</h6>
-                <div class="row d-flex align-items-center">
-                  <div class="col-9">
-                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="ph ph-arrow-up text-success f-30 m-r-10"></i>$249.95</h3>
-                  </div>
-
-                  <div class="col-3 text-end">
-                    <p class="m-b-0">67%</p>
-                  </div>
-                </div>
-                <div class="progress m-t-30" style="height: 7px">
-                  <div
-                    class="progress-bar bg-brand-color-1"
-                    role="progressbar"
-                    style="width: 50%"
-                    aria-valuenow="50"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
+          
+          <div class="col-xl-9 col-lg-8">
+            <div class="card card-dark-custom h-100">
+              <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="text-white mb-0 d-flex align-items-center">
+                  <span class="text-danger me-2" style="font-size: 18px; letter-spacing: -2px;">|||</span> 
+                  MTT Live Monitor Project Map
+                </h5>
+              <!-- PINDAH NAV PROJECT KE SINI -->
+                <div class="d-flex bg-dark" style="border: 1px solid #333; border-radius: 6px; padding: 2px;">
+                  <button class="map-btn active"><i class="ph ph-crosshair me-1"></i> Indonesia View</button>
                 </div>
               </div>
-            </div>
-          </div>
-          <!-- [ daily sales section ] end -->
-
-          <!-- [ Monthly  sales section ] start -->
-          <div class="col-md-6 col-xl-4">
-            <div class="card">
-              <div class="card-body">
-                <h6 class="mb-4">Monthly Sales</h6>
-                <div class="row d-flex align-items-center">
-                  <div class="col-9">
-                    <h3 class="f-w-300 d-flex align-items-center m-b-0"
-                      ><i class="ph ph-arrow-down text-danger f-30 m-r-10"></i>$2.942.32</h3
-                    >
-                  </div>
-                  <div class="col-3 text-end">
-                    <p class="m-b-0">36%</p>
-                  </div>
-                </div>
-                <div class="progress m-t-30" style="height: 7px">
-                  <div
-                    class="progress-bar bg-brand-color-2"
-                    role="progressbar"
-                    style="width: 35%"
-                    aria-valuenow="35"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
+              <div class="card-body p-3">
+                <div class="map-container" style="width: 100%; height: 600px; border-radius: 8px; overflow: hidden; border: 1px solid #333;">
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    scrolling="no" 
+                    marginheight="0" 
+                    marginwidth="0" 
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=94.0000%2C-11.0000%2C141.0000%2C6.0000&amp;layer=mapnik" 
+                    style="border: 0; filter: brightness(0.9) contrast(1.1) saturate(0.8);">
+                  </iframe>
                 </div>
               </div>
             </div>
           </div>
-          <!-- [ Monthly  sales section ] end -->
-
-          <!-- [ year  sales section ] start -->
-          <div class="col-md-12 col-xl-4">
-            <div class="card">
-              <div class="card-body">
-                <h6 class="mb-4">Yearly Sales</h6>
-                <div class="row d-flex align-items-center">
-                  <div class="col-9">
-                    <h3 class="f-w-300 d-flex align-items-center m-b-0"
-                      ><i class="ph ph-arrow-up text-success f-30 m-r-10"></i>$8.638.32</h3
-                    >
-                  </div>
-                  <div class="col-3 text-end">
-                    <p class="m-b-0">80%</p>
-                  </div>
-                </div>
-                <div class="progress m-t-30" style="height: 7px">
-                  <div
-                    class="progress-bar bg-brand-color-1"
-                    role="progressbar"
-                    style="width: 70%"
-                    aria-valuenow="70"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
-                </div>
-              </div>
-            </div>
+          <div class="col-xl-3 col-lg-4">
+          <div class="nav-projects d-none d-md-flex ms-3 align-items-center">
+            
           </div>
-          <!-- [ year  sales section ] end -->
-
-          <!-- [ worldLow section ] start -->
-          <div class="col-xl-8 col-md-6">
-            <div class="card">
-              <div class="card-header">
-                <h5>Users From United States</h5>
+            <div class="card card-dark-custom mb-4">
+              <div class="card-header border-0 pb-1">
+                <h5 class="text-white mb-0 d-flex align-items-center">
+                  <i class="ph ph-arrows-left-right text-muted me-2 f-20"></i> IP Status
+                </h5>
               </div>
-              <div class="card-body">
-                <div id="world-low" style="height: 450px"></div>
-              </div>
-            </div>
-          </div>
-          <!-- [ worldLow section ] end -->
-
-          <!-- [ statistics year chart ] start -->
-          <div class="col-xl-4 col-md-6">
-            <div class="card bg-primary">
-              <div class="card-header border-0">
-                <h5 class="text-white">Earnings</h5>
-              </div>
-              <div class="card-body" style="padding: 0 25px">
-                <div class="earning-text mb-0">
-                  <h3 class="mb-2 text-white f-w-300">$4295.36 <i class="ph ph-arrow-up teal accent-3"></i></h3>
-                  <span class="text-uppercase text-white d-block">Total Earnings</span>
-                </div>
-                <div id="Widget-line-chart" class="WidgetlineChart2 ChartShadow" style="height: 180px"></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-body border-bottom">
-                <div class="row d-flex align-items-center">
-                  <div class="col-auto">
-                    <i class="ph ph-lightbulb-filament f-30 text-success"></i>
-                  </div>
-                  <div class="col">
-                    <h3 class="f-w-300">235</h3>
-                    <span class="d-block text-uppercase">TOTAL IDEAS</span>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="row d-flex align-items-center">
-                  <div class="col-auto">
-                    <i class="ph ph-map-pin-line f-30 text-primary"></i>
-                  </div>
-                  <div class="col">
-                    <h3 class="f-w-300">26</h3>
-                    <span class="d-block text-uppercase">TOTAL LOCATIONS</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- [ statistics year chart ] end -->
-
-          <!-- [social-media section] start -->
-          <div class="col-md-12 col-xl-4">
-            <div class="card card-social">
-              <div class="card-body border-bottom">
-                <div class="row align-items-center justify-content-center">
-                  <div class="col-auto">
-                    <i class="ti ti-brand-facebook-filled text-primary f-36"></i>
-                  </div>
-                  <div class="col text-end">
-                    <h3>12,281</h3>
-                    <h5 class="text-success mb-0">+7.2% <span class="text-muted">Total Likes</span></h5>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="row align-items-center justify-content-center card-active">
-                  <div class="col-6">
-                    <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>35,098</h6>
-                    <div class="progress">
-                      <div
-                        class="progress-bar bg-brand-color-1"
-                        role="progressbar"
-                        style="width: 60%; height: 6px"
-                        aria-valuenow="60"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Duration:</span>350</h6>
-                    <div class="progress">
-                      <div
-                        class="progress-bar bg-brand-color-2"
-                        role="progressbar"
-                        style="width: 45%; height: 6px"
-                        aria-valuenow="45"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 col-xl-4">
-            <div class="card card-social">
-              <div class="card-body border-bottom">
-                <div class="row align-items-center justify-content-center">
-                  <div class="col-auto">
-                    <i class="ti ti-brand-twitter-filled text-info f-36"></i>
-                  </div>
-                  <div class="col text-end">
-                    <h3>11,200</h3>
-                    <h5 class="text-c-purple mb-0">+6.2% <span class="text-muted">Total Likes</span></h5>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="row align-items-center justify-content-center card-active">
-                  <div class="col-6">
-                    <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>34,185</h6>
-                    <div class="progress">
-                      <div
-                        class="progress-bar progress-c-green"
-                        role="progressbar"
-                        style="width: 40%; height: 6px"
-                        aria-valuenow="40"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Duration:</span>800</h6>
-                    <div class="progress">
-                      <div
-                        class="progress-bar progress-c-blue"
-                        role="progressbar"
-                        style="width: 70%; height: 6px"
-                        aria-valuenow="70"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 col-xl-4">
-            <div class="card card-social">
-              <div class="card-body border-bottom">
-                <div class="row align-items-center justify-content-center">
-                  <div class="col-auto">
-                    <i class="ti ti-brand-google-filled text-danger f-36"></i>
-                  </div>
-                  <div class="col text-end">
-                    <h3>10,500</h3>
-                    <h5 class="text-primary mb-0">+5.9% <span class="text-muted">Total Likes</span></h5>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="row align-items-center justify-content-center card-active">
-                  <div class="col-6">
-                    <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>25,998</h6>
-                    <div class="progress">
-                      <div
-                        class="progress-bar bg-brand-color-1"
-                        role="progressbar"
-                        style="width: 80%; height: 6px"
-                        aria-valuenow="80"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Duration:</span>900</h6>
-                    <div class="progress">
-                      <div
-                        class="progress-bar bg-brand-color-2"
-                        role="progressbar"
-                        style="width: 50%; height: 6px"
-                        aria-valuenow="50"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- [social-media section] end -->
-
-          <!-- [ rating list ] starts-->
-          <div class="col-xl-4 col-md-6">
-            <div class="card user-list">
-              <div class="card-header">
-                <h5>Rating</h5>
-              </div>
-              <div class="card-body">
-                <div class="row align-items-center justify-content-center m-b-20">
-                  <div class="col-6">
-                    <h2 class="f-w-300 d-flex align-items-center float-start m-0"
-                      >4.7 <i class="ti ti-star-filled f-10 m-l-10 text-warning"></i
-                    ></h2>
-                  </div>
-                  <div class="col-6">
-                    <h6 class="d-flex align-items-center float-end m-0"
-                      >0.4 <i class="ti ti-caret-up-filled text-success f-22 m-l-10"></i
-                    ></h6>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-xl-12">
-                    <h6 class="align-items-center float-start"><i class="ti ti-star-filled f-10 m-r-10 text-warning"></i>5</h6>
-                    <h6 class="align-items-center float-end">384</h6>
-                    <div class="progress m-t-30 m-b-20" style="height: 6px">
-                      <div
-                        class="progress-bar bg-brand-color-1"
-                        role="progressbar"
-                        style="width: 70%"
-                        aria-valuenow="70"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-xl-12">
-                    <h6 class="align-items-center float-start"><i class="ti ti-star-filled f-10 m-r-10 text-warning"></i>4</h6>
-                    <h6 class="align-items-center float-end">145</h6>
-                    <div class="progress m-t-30 m-b-20" style="height: 6px">
-                      <div
-                        class="progress-bar bg-brand-color-1"
-                        role="progressbar"
-                        style="width: 35%"
-                        aria-valuenow="35"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-xl-12">
-                    <h6 class="align-items-center float-start"><i class="ti ti-star-filled f-10 m-r-10 text-warning"></i>3</h6>
-                    <h6 class="align-items-center float-end">24</h6>
-                    <div class="progress m-t-30 m-b-20" style="height: 6px">
-                      <div
-                        class="progress-bar bg-brand-color-1"
-                        role="progressbar"
-                        style="width: 25%"
-                        aria-valuenow="25"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-xl-12">
-                    <h6 class="align-items-center float-start"><i class="ti ti-star-filled f-10 m-r-10 text-warning"></i>2</h6>
-                    <h6 class="align-items-center float-end">1</h6>
-                    <div class="progress m-t-30 m-b-20" style="height: 6px">
-                      <div
-                        class="progress-bar bg-brand-color-1"
-                        role="progressbar"
-                        style="width: 10%"
-                        aria-valuenow="10"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="col-xl-12">
-                    <h6 class="align-items-center float-start"><i class="ti ti-star-filled f-10 m-r-10 text-warning"></i>1</h6>
-                    <h6 class="align-items-center float-end">0</h6>
-                    <div class="progress m-t-30 m-b-20" style="height: 6px">
-                      <div
-                        class="progress-bar"
-                        role="progressbar"
-                        style="width: 0"
-                        aria-valuenow="0"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- [ rating list ] end -->
-
-          <!-- [ Recent Users ] start -->
-          <div class="col-xl-8 col-md-6">
-            <div class="card Recent-Users table-card">
-              <div class="card-header">
-                <h5>Recent Users</h5>
-              </div>
-              <div class="card-body px-0 py-3">
+              <div class="card-body p-0">
                 <div class="table-responsive">
-                  <table class="table table-hover mb-0">
+                  <table class="table table-ip mb-0">
+                    <thead>
+                      <tr>
+                        <th class="ps-4">IP</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
                     <tbody>
-                      <tr class="unread">
-                        <td
-                          ><img class="rounded-circle" style="width: 40px" src="../assets/images/user/avatar-1.png" alt="activity-user"
-                        /></td>
-                        <td>
-                          <h6 class="mb-1">Isabella Christensen</h6>
-                          <p class="m-0">Lorem Ipsum is simply dummy</p>
-                        </td>
-                        <td>
-                          <h6 class="text-muted"><i class="ti ti-circle-filled text-success f-10 m-r-15"></i>11 MAY 12:56</h6>
-                        </td>
-                        <td
-                          ><a href="#!" class="badge me-2 bg-brand-color-2 text-white f-12">Reject</a
-                          ><a href="#!" class="badge me-2 bg-brand-color-1 text-white f-12">Approve</a></td
-                        >
+                      <tr>
+                        <td class="ps-4">192.172.60.1</td>
+                        <td>2mins</td>
+                        <td><div class="status-pill danger"></div></td>
                       </tr>
-                      <tr class="unread">
-                        <td
-                          ><img class="rounded-circle" style="width: 40px" src="../assets/images/user/avatar-2.png" alt="activity-user"
-                        /></td>
-                        <td>
-                          <h6 class="mb-1">Mathilde Andersen</h6>
-                          <p class="m-0">Lorem Ipsum is simply</p>
-                        </td>
-                        <td>
-                          <h6 class="text-muted"><i class="ti ti-circle-filled text-danger f-10 m-r-15"></i>11 MAY 10:35</h6>
-                        </td>
-                        <td
-                          ><a href="#!" class="badge me-2 bg-brand-color-2 text-white f-12">Reject</a
-                          ><a href="#!" class="badge me-2 bg-brand-color-1 text-white f-12">Approve</a></td
-                        >
+                      <tr>
+                        <td class="ps-4">192.172.60.4</td>
+                        <td>2mins</td>
+                        <td><div class="status-pill danger"></div></td>
                       </tr>
-                      <tr class="unread">
-                        <td
-                          ><img class="rounded-circle" style="width: 40px" src="../assets/images/user/avatar-3.png" alt="activity-user"
-                        /></td>
-                        <td>
-                          <h6 class="mb-1">Karla Sorensen</h6>
-                          <p class="m-0">Lorem Ipsum is simply dummy</p>
-                        </td>
-                        <td>
-                          <h6 class="text-muted"><i class="ti ti-circle-filled text-success f-10 m-r-15"></i>9 MAY 17:38</h6>
-                        </td>
-                        <td
-                          ><a href="#!" class="badge me-2 bg-brand-color-2 text-white f-12">Reject</a
-                          ><a href="#!" class="badge me-2 bg-brand-color-1 text-white f-12">Approve</a></td
-                        >
+                      <tr>
+                        <td class="ps-4">192.168.1.1</td>
+                        <td>5 mins</td>
+                        <td><div class="status-pill success"></div></td>
                       </tr>
-                      <tr class="unread">
-                        <td
-                          ><img class="rounded-circle" style="width: 40px" src="../assets/images/user/avatar-1.png" alt="activity-user"
-                        /></td>
-                        <td>
-                          <h6 class="mb-1">Ida Jorgensen</h6>
-                          <p class="m-0">Lorem Ipsum is simply</p>
-                        </td>
-                        <td>
-                          <h6 class="text-muted f-w-300"><i class="ti ti-circle-filled text-danger f-10 m-r-15"></i>19 MAY 12:56</h6>
-                        </td>
-                        <td
-                          ><a href="#!" class="badge me-2 bg-brand-color-2 text-white f-12">Reject</a
-                          ><a href="#!" class="badge me-2 bg-brand-color-1 text-white f-12">Approve</a></td
-                        >
-                      </tr>
-                      <tr class="unread">
-                        <td
-                          ><img class="rounded-circle" style="width: 40px" src="../assets/images/user/avatar-2.png" alt="activity-user"
-                        /></td>
-                        <td>
-                          <h6 class="mb-1">Albert Andersen</h6>
-                          <p class="m-0">Lorem Ipsum is</p>
-                        </td>
-                        <td>
-                          <h6 class="text-muted"><i class="ti ti-circle-filled text-success f-10 m-r-15"></i>21 July 12:56</h6>
-                        </td>
-                        <td
-                          ><a href="#!" class="badge me-2 bg-brand-color-2 text-white f-12">Reject</a
-                          ><a href="#!" class="badge me-2 bg-brand-color-1 text-white f-12">Approve</a></td
-                        >
+                      <tr>
+                        <td class="ps-4">192.168.1.2</td>
+                        <td>5 mins</td>
+                        <td><div class="status-pill success"></div></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
+
+            <div class="card border-0" style="background-color: #f8f9fa; border-radius: 12px;">
+              <div class="card-body">
+                <h6 class="text-dark fw-bold mb-4 d-flex align-items-center">
+                  <span class="bg-danger me-2" style="width: 4px; height: 14px; border-radius: 2px;"></span> System status
+                </h6>
+                <div class="d-flex justify-content-around text-center mb-2">
+                  
+                  <div>
+                    <div class="status-ring ring-success mb-2">
+                      <div class="status-dot dot-success"></div>
+                    </div>
+                    <span class="text-success small fw-bold">Connect</span>
+                  </div>
+
+                  <div>
+                    <div class="status-ring ring-danger mb-2">
+                      <div class="status-dot dot-danger"></div>
+                    </div>
+                    <span class="text-danger small fw-bold">Error</span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
-          <!-- [ Recent Users ] end -->
-        </div>
-        <!-- [ Main Content ] end -->
+          </div>
       </div>
     </div>
-    <!-- [ Main Content ] end -->
-    <footer class="pc-footer">
-      <div class="footer-wrapper container-fluid">
-        <div class="row">
-          <div class="col my-1">
-            <p class="m-0">Datta able &#9829; crafted by Team <a href="https://codedthemes.com/" target="_blank">Codedthemes</a></p>
-          </div>
-          <div class="col-md-auto my-1">
-            <ul class="list-inline footer-link mb-0">
-              <li class="list-inline-item"><a href="../index.html">Home</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
+  <script>
+  function updateClock() {
+      const now = new Date();
 
+      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dayName = days[now.getDay()];
 
-    <!-- [Page Specific JS] start -->
-    <!-- apexcharts js -->
-    <script src="../assets/js/plugins/apexcharts.min.js"></script>
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
 
-    <script src="../assets/js/plugins/jsvectormap.min.js"></script>
-    <script src="../assets/js/plugins/world.js"></script>
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    <script src="../assets/js/dashboard/dashboard-default.js"></script>
-    <!-- [Page Specific JS] end -->
-    <!-- Required Js -->
+      const formatted = `${dayName}, ${day}/${month}/${year} &nbsp; ${hours}:${minutes}:${seconds}`;
+
+      document.getElementById("live-clock").innerHTML = formatted;
+  }
+
+  // jalanin pertama kali
+  updateClock();
+
+  // update tiap 1 detik
+  setInterval(updateClock, 1000);
+  </script>
     <script src="../assets/js/plugins/popper.min.js"></script>
     <script src="../assets/js/plugins/simplebar.min.js"></script>
     <script src="../assets/js/plugins/bootstrap.min.js"></script>
-    <script src="../assets/js/script.js"></script>
-    <script src="../assets/js/theme.js"></script>
-
-
-       
-    <script>
-      layout_change('light');
-    </script>
-       
-    <script>
-      change_box_container('false');
-    </script>
-     
-    <script>
-      layout_caption_change('true');
-    </script>
-       
-    <script>
-      layout_rtl_change('false');
-    </script>
-     
-    <script>
-      preset_change('preset-1');
-    </script>
-     
-    <script>
-      layout_theme_sidebar_change('false');
-    </script>
-            
-
+    <script src="../assets/js/fonts/custom-font.js"></script>
+    <script src="../assets/js/pcoded.js"></script>
+    <script src="../assets/js/plugins/feather.min.js"></script>
   </body>
-  <!-- [Body] end -->
-</html>
+  </html>
