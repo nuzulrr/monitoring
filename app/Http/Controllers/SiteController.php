@@ -11,9 +11,14 @@ class SiteController extends Controller
 {
 public function index()
 {
+      $projek = Projek::all(); 
+
+    // Mengambil semua data site beserta relasi proyeknya untuk tabel IP
+    $site = Site::with('projek')->get();
+
     return view('layouts.app', [
-        'projek' => Projek::all(), // 
-        'site' => Site::with('projek')->get()
+        'projek' => $projek,
+        'sites' => $site // Saya ganti namanya jadi 'sites' agar lebih jamak
     ]);
 }
 public function store(Request $request)
@@ -32,37 +37,99 @@ public function store(Request $request)
 
     return redirect()->back()->with('success', 'Site berhasil disimpan');
 }
-// app/Http/Controllers/SiteController.php
-
-public function checkStatus(Request $request)
+public function update(Request $request, $id_site)
     {
-        $ip = $request->query('ip');
+        // Validasi input sesuai schema di gambar
+        $request->validate([
+            'id_projek'     => 'required|exists:projek,id_projek',
+            'ip_address'    => 'required|ip',
+            'alamat'        => 'required|string',
+            'latitude'      => 'required|numeric',
+            'longitude'     => 'required|numeric',
+            'tgl_instalasi' => 'required|date',
+            'note'          => 'nullable|string',
+        ]);
 
-        if (!$ip) {
-            return response()->json(['status' => 'offline', 'message' => 'IP tidak ditemukan'], 400);
-        }
-
-        // Cek OS untuk menentukan parameter ping
-        // -c 1 (Linux/Mac), -n 1 (Windows)
-        // -W 1 (Timeout 1 detik agar tidak lambat)
-        $str = (PHP_OS_FAMILY === 'Windows') 
-                ? "ping -n 1 -w 1000 " . escapeshellarg($ip) 
-                : "ping -c 1 -W 1 " . escapeshellarg($ip);
-
-        exec($str, $output, $result);
-
-        // Jika $result == 0 artinya Reply (Online)
-        // Jika $result != 0 artinya RTO (Offline)
-        if ($result === 0) {
-            return response()->json([
-                'status' => 'online',
-                'ip' => $ip
+        try {
+            // Mencari data berdasarkan primary key id_site
+            $site = Site::where('id_site', $id_site)->firstOrFail();
+            
+            // Update data
+            $site->update([
+                'id_projek'     => $request->id_projek,
+                'ip_address'    => $request->ip_address,
+                'alamat'        => $request->alamat,
+                'latitude'      => $request->latitude,
+                'longitude'     => $request->longitude,
+                'tgl_instalasi' => $request->tgl_instalasi,
+                'note'          => $request->note,
             ]);
-        } else {
-            return response()->json([
-                'status' => 'offline',
-                'ip' => $ip
-            ]);
+
+            return redirect()->back()->with('success', 'Data site berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
+public function destroy($id_site)
+{
+    try {
+        $site = Site::where('id_site', $id_site)->firstOrFail();
+        $site->delete();
+
+        // Respon JSON untuk ditangkap JavaScript
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus dari sistem.'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan pada server.'
+        ], 500);
+    }
+}
+
+public function checkStatus(Request $request)
+{
+    $ip = $request->query('ip');
+
+    if (!$ip) {
+        return response()->json(['status' => 'offline', 'message' => 'IP tidak ditemukan'], 400);
+    }
+
+    $isWindows = PHP_OS_FAMILY === 'Windows';
+    $str = $isWindows 
+            ? "ping -n 1 -w 1000 " . escapeshellarg($ip) 
+            : "ping -c 1 -W 1 " . escapeshellarg($ip);
+
+    exec($str, $output, $result);
+
+    if ($result === 0) {
+        // Ambil baris yang berisi info waktu (ms)
+        $responseTime = 0;
+        $outputString = implode(" ", $output);
+
+        if ($isWindows) {
+            // Windows: "time=15ms" atau "waktu=15ms"
+            preg_match('/(?:time|waktu)[=<](\d+)ms/i', $outputString, $matches);
+            $responseTime = isset($matches[1]) ? $matches[1] : 0;
+        } else {
+            // Linux: "time=14.5 ms"
+            preg_match('/time=(\d+\.?\d*)\s*ms/i', $outputString, $matches);
+            $responseTime = isset($matches[1]) ? round($matches[1]) : 0;
+        }
+
+        return response()->json([
+            'status' => 'online',
+            'ip' => $ip,
+            'response_time' => $responseTime // Sekarang data ini dikirim!
+        ]);
+    } else {
+        return response()->json([
+            'status' => 'offline',
+            'ip' => $ip,
+            'response_time' => 0
+        ]);
+    }
+}
 }
