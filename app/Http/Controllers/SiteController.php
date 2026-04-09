@@ -93,28 +93,54 @@ public function checkStatus(Request $request)
 {
     $ip = $request->query('ip');
 
-    if (!$ip) {
-        return response()->json(['status' => 'offline', 'message' => 'IP tidak ditemukan'], 400);
+    // ⚫ 1. CEK IP KOSONG / NULL
+    if (!$ip || trim($ip) === '') {
+        return response()->json([
+            'status' => 'unreachable',
+            'message' => 'IP kosong'
+        ]);
+    }
+
+    // ⚫ 2. VALIDASI FORMAT IP
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        return response()->json([
+            'status' => 'unreachable',
+            'message' => 'IP tidak valid'
+        ]);
     }
 
     $isWindows = PHP_OS_FAMILY === 'Windows';
-    $str = $isWindows 
-            ? "ping -n 1 -w 1000 " . escapeshellarg($ip) 
-            : "ping -c 1 -W 1 " . escapeshellarg($ip);
 
-    exec($str, $output, $result);
+    $command = $isWindows
+        ? "ping -n 1 -w 1000 " . escapeshellarg($ip)
+        : "ping -c 1 -W 1 " . escapeshellarg($ip);
 
+    exec($command, $output, $result);
+
+    $outputString = implode(" ", $output);
+
+    // ⚫ 3. DETEKSI HOST UNREACHABLE (LEVEL NETWORK)
+    if (
+        str_contains(strtolower($outputString), 'unreachable') ||
+        str_contains(strtolower($outputString), 'could not find host') ||
+        str_contains(strtolower($outputString), 'unknown host')
+    ) {
+        return response()->json([
+            'status' => 'unreachable',
+            'ip' => $ip,
+            'response_time' => 0
+        ]);
+    }
+
+    // 🟢 4. ONLINE
     if ($result === 0) {
-        // Ambil baris yang berisi info waktu (ms)
+
         $responseTime = 0;
-        $outputString = implode(" ", $output);
 
         if ($isWindows) {
-            // Windows: "time=15ms" atau "waktu=15ms"
             preg_match('/(?:time|waktu)[=<](\d+)ms/i', $outputString, $matches);
             $responseTime = isset($matches[1]) ? $matches[1] : 0;
         } else {
-            // Linux: "time=14.5 ms"
             preg_match('/time=(\d+\.?\d*)\s*ms/i', $outputString, $matches);
             $responseTime = isset($matches[1]) ? round($matches[1]) : 0;
         }
@@ -122,14 +148,14 @@ public function checkStatus(Request $request)
         return response()->json([
             'status' => 'online',
             'ip' => $ip,
-            'response_time' => $responseTime // Sekarang data ini dikirim!
-        ]);
-    } else {
-        return response()->json([
-            'status' => 'offline',
-            'ip' => $ip,
-            'response_time' => 0
+            'response_time' => $responseTime
         ]);
     }
-}
-}
+
+    // 🔴 5. OFFLINE (TIMEOUT / NO RESPONSE)
+    return response()->json([
+        'status' => 'offline',
+        'ip' => $ip,
+        'response_time' => 0
+    ]);
+}}

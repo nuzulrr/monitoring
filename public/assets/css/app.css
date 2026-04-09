@@ -1,0 +1,262 @@
+    /* Custom Styling to match the screenshot exactly */
+    body {
+      background-color: #1a1a1c !important;
+    }
+
+    .pc-header {
+      background-color: #121213 !important;
+      left: 0 !important;
+      /* Remove sidebar offset */
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .pc-container {
+      margin-left: 0 !important;
+      /* Remove sidebar offset */
+      padding-top: 30px;
+    }
+
+    .top-nav-btn {
+      background-color: transparent;
+      color: #a0a0a0;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 5px 15px;
+      font-size: 13px;
+      margin-right: 8px;
+    }
+
+    .top-nav-btn.active {
+      background-color: #a81c1c;
+      color: #fff;
+      border-color: #a81c1c;
+    }
+
+    .search-bar {
+      background-color: transparent;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      padding: 5px 15px 5px 35px;
+      font-size: 13px;
+    }
+
+    .search-icon-wrapper {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+
+    .card-dark-custom {
+      background-color: #212123;
+      border: 1px solid #333;
+      border-radius: 10px;
+    }
+
+    .status-pill {
+      height: 18px;
+      width: 65px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .status-pill.danger {
+      background-color: #b72b2b;
+    }
+
+    .status-pill.success {
+      background-color: #23cc38;
+    }
+
+    .table-ip th {
+      color: #6c757d;
+      font-weight: 500;
+      font-size: 13px;
+      border-bottom: none;
+    }
+
+    .table-ip td {
+      color: #d1d1d1;
+      font-size: 13px;
+      vertical-align: middle;
+      border-top: 1px solid #2a2a2a;
+    }
+
+    .map-btn {
+      background-color: transparent;
+      color: #a0a0a0;
+      border: none;
+      font-size: 13px;
+      padding: 5px 10px;
+    }
+
+    .map-btn.active {
+      color: #fff;
+    }
+
+    .status-ring {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+
+    .ring-success {
+      background-color: #d2f4d6;
+    }
+
+    .dot-success {
+      background-color: #1ab82c;
+    }
+
+    .ring-danger {
+      background-color: #f4d2d2;
+    }
+
+    .dot-danger {
+      background-color: #b81a1a;
+    }
+
+    /* TAMBAHAN KODE: Style untuk tombol Add Site & Add Project */
+    .btn-add-action {
+      background-color: #23cc38;
+      /* Warna hijau default */
+      color: #fff;
+      border: 1px solid #23cc38;
+      border-radius: 6px;
+      padding: 5px 15px;
+      font-size: 13px;
+      margin-right: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-add-action:hover {
+      background-color: #1ea32d;
+      border-color: #1ea32d;
+    }
+
+    .btn-add-action.active {
+      background-color: #000000;
+      /* Warna hitam saat aktif */
+      border-color: #000000;
+      color: #fff;
+    }
+    .leaflet-control-geocoder {
+      z-index: 9999 !important;
+    }
+    .dropdown-menu {
+        display: none;
+        opacity: 0;
+        transition: 0.2s ease;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+        opacity: 1;
+    }
+    .status-pill.secondary {
+        background-color: #6c757d; /* abu-abu */
+    }
+
+.status-icon {
+    border-radius: 50%;
+    border: 2px solid rgb(0, 0, 0);
+    width: 20px !important;
+    height: 20px !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    display: block;
+    position: absolute;
+    transform-origin: center center;
+    transition: background-color 0.5s ease;
+}
+
+/* 🟢 ONLINE (kedip pelan) */
+.status-online {
+    background-color: #28a745;
+    box-shadow: 0 0 10px #28a745;
+}
+
+/* 🔴 OFFLINE (kedip cepat) */
+.status-offline {
+    background-color: yellow;
+    box-shadow: 0 0 15px yellow;
+    animation: blink-fast 1.5s infinite;
+}
+
+/* ⚫ UNREACHABLE (diam) */
+.status-unreachable {
+    background-color: red;
+    box-shadow: 0 0 5px red;
+    animation: blink-fast 0.6s infinite;
+}
+
+/* 🟡 CHECKING (tetap) */
+.status-checking {
+    background-color: gray !important;
+    animation: pulse 1.5s infinite;
+}
+
+/* 🔥 ANIMASI BARU */
+@keyframes blink-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+@keyframes blink-fast {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ===== TETAP PUNYA KAMU (TIDAK DIHAPUS) ===== */
+
+.status-pill {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    transition: all 0.5s ease;
+}
+
+.status-pill.success { 
+    background-color: #2ecc71; 
+    box-shadow: 0 0 10px #2ecc71; 
+}
+
+.status-pill.danger { 
+    background-color: #e74c3c; 
+    box-shadow: 0 0 10px #e74c3c; 
+}
+
+.status-pill.warning { 
+    background-color: #f1c40f; 
+    box-shadow: 0 0 10px #f1c40f; 
+}
+
+/* TAMBAHAN UNREACHABLE */
+.status-pill.secondary {
+    background-color: #f1c40f; 
+    box-shadow: 0 0 5px #f1c40f;
+}
+
+/* Animasi checking */
+.animate-pulse {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
