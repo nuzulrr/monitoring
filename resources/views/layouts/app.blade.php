@@ -269,7 +269,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                            success ') }}',
+                              success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -298,13 +298,21 @@
               </div>
             </div>
             <div class="card-body p-3">
-              <div class="map-container"
+            <div class="map-container position-relative"
                 style="width: 100%; height: 600px; border-radius: 8px; overflow: hidden; border: 1px solid #333;">
+
+                <!-- MAP -->
                 <div id="map-home" style="width: 100%; height: 100%;"></div>
 
+                <!-- OVERLAY CLICK -->
+                <div id="map-overlay"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;
+                    display:flex;align-items:center;justify-content:center;
+                    color:white;font-size:14px;cursor:pointer;z-index:999;">
+                  
+                </div>
 
-              </div>
-
+            </div>
             </div>
           </div>
         </div>
@@ -588,6 +596,7 @@
 
       });
 
+    // Modal Lokasi: Validasi & Submit Form
     function confirmSimpanLokasi() {
 
       let projek = document.querySelector('[name="id_projek"]').value;
@@ -640,125 +649,172 @@
 
 
     // Peta Home: Menampilkan semua site dengan status real-time
-    document.addEventListener('DOMContentLoaded', function () {
-      // 1. Inisialisasi Peta
-      const mapHome = L.map('map-home').setView([-2.5489, 118.0149], 5);
+document.addEventListener('DOMContentLoaded', function () {
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // 🔥 INIT MAP (SEMUA INTERAKSI DIMATIKAN)
+    const mapHome = L.map('map-home', {
+        scrollWheelZoom: false,
+        dragging: false,
+        touchZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false
+    }).setView([-2.5489, 118.0149], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(mapHome);
+    }).addTo(mapHome);
 
-      const sites = @json($sites);
-      const markersCoordinates = [];
-      const
-        markerInstances = {}; // Menyimpan referensi marker agar bisa diupdate warnanya
+    const sites = @json($sites);
+    const markersCoordinates = [];
+    const markerInstances = {};
 
-      // 2. Tambahkan Marker ke Peta
-      sites.forEach(function (item) {
+    // 🔥 MARKER LOOP
+    sites.forEach(function (item) {
         if (item.latitude && item.longitude) {
-          const lat = parseFloat(item.latitude);
-          const lng = parseFloat(item.longitude);
 
-          if (!isNaN(lat) && !isNaN(lng)) {
-            // Buat Icon menggunakan divIcon (bukan marker gambar standar)
-            const customIcon = L.divIcon({
-              className: 'status-icon status-checking', // Default: Abu-abu
-              html: ''
-            });
+            const lat = parseFloat(item.latitude);
+            const lng = parseFloat(item.longitude);
 
-            const marker = L.marker([lat, lng], {
-              icon: customIcon
-            }).addTo(mapHome);
+            if (!isNaN(lat) && !isNaN(lng)) {
 
-            // Simpan referensi marker ke object global berdasarkan ID site
-            markerInstances[item.id_site] = marker;
+                const customIcon = L.divIcon({
+                    className: 'status-icon status-checking',
+                    html: ''
+                });
 
-            const namaProjek = item.projek ? item.projek
-              .nama_projek : 'Tanpa Projek';
+                const marker = L.marker([lat, lng], {
+                    icon: customIcon
+                }).addTo(mapHome);
 
-            // Konten Popup dengan ID status teks agar bisa diupdate
-            const popupContent = `
-                        <div style="font-family: sans-serif; min-width: 180px;">
-                            <h6 style="margin: 0 0 5px 0; color: #007bff;">${namaProjek}</h6>
-                            <hr style="margin: 5px 0;">
-                            <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
-                                <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site}" style="color:gray">Checking...</b></td></tr>
-                                <tr><td><b>IP:</b></td><td><code>${item.ip_address ?? '-'}</code></td></tr>
-                                <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
-                            </table>
-                        </div>
-                    `;
+                markerInstances[item.id_site] = marker;
 
-            marker.bindPopup(popupContent);
-            markersCoordinates.push([lat, lng]);
+                const namaProjek = item.projek ? item.projek.nama_projek : 'Tanpa Projek';
 
-            // Jalankan monitoring untuk site ini
-            monitorIP(item.ip_address, item.id_site);
-          }
+                const popupContent = `
+                    <div style="font-family: sans-serif; min-width: 180px;">
+                        <h6 style="margin: 0 0 5px 0; color: #007bff;">${namaProjek}</h6>
+                        <hr style="margin: 5px 0;">
+                        <table style="width: 100%; font-size: 12px;">
+                            <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site}" style="color:gray">Checking...</b></td></tr>
+                            <tr><td><b>IP:</b></td><td><code>${item.ip_address ?? '-'}</code></td></tr>
+                            <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
+                        </table>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                markersCoordinates.push([lat, lng]);
+
+                monitorIP(item.ip_address, item.id_site);
+            }
         }
-      });
+    });
 
-      // 3. Auto Zoom agar semua marker terlihat
-      if (markersCoordinates.length > 0) {
+    // 🔥 AUTO ZOOM
+    if (markersCoordinates.length > 0) {
         const bounds = L.latLngBounds(markersCoordinates);
-        mapHome.fitBounds(bounds, {
-          padding: [50, 50]
-        });
-      }
+        mapHome.fitBounds(bounds, { padding: [50, 50] });
+    }
 
-      // 4. Fungsi Monitoring Real-time
-      function monitorIP(ip, siteId) {
+    // 🔥 REALTIME MONITOR
+    function monitorIP(ip, siteId) {
         function updateStatus() {
-          fetch(`/api/check-status?ip=${ip}`)
-            .then(res => res.json())
-            .then(data => {
-              const marker = markerInstances[siteId];
-              if (!marker) return;
+            fetch(`/api/check-status?ip=${ip}`)
+                .then(res => res.json())
+                .then(data => {
 
-              const iconElement = marker.getElement();
-              const textStatus = document.getElementById(
-                `status-text-${siteId}`);
+                    const marker = markerInstances[siteId];
+                    if (!marker) return;
 
-              if (!iconElement) return;
+                    const iconElement = marker.getElement();
+                    const textStatus = document.getElementById(`status-text-${siteId}`);
+                    if (!iconElement) return;
 
-              // BERSIHKAN STATUS SEBELUMNYA TANPA MENGHAPUS 'status-icon'
-              iconElement.classList.remove('status-online',
-                'status-offline', 'status-checking');
-iconElement.classList.remove(
-    'status-online',
-    'status-offline',
-    'status-unreachable',
-    'status-checking'
-);
+                    // RESET CLASS
+                    iconElement.classList.remove(
+                        'status-online',
+                        'status-offline',
+                        'status-unreachable',
+                        'status-checking'
+                    );
 
-if (data.status === 'online') {
-    iconElement.classList.add('status-online');
-    textStatus.innerText = 'ONLINE';
-    textStatus.style.color = 'lime';
+                    // 🔥 STATUS
+                    if (data.status === 'online') {
+                        iconElement.classList.add('status-online');
+                        textStatus.innerText = 'ONLINE';
+                        textStatus.style.color = 'lime';
 
-} else if (data.status === 'offline') {
-    iconElement.classList.add('status-offline');
-    textStatus.innerText = 'RTO (Offline)';
-    textStatus.style.color = 'yellow';
+                    } else if (data.status === 'offline') {
+                        iconElement.classList.add('status-offline');
+                        textStatus.innerText = 'RTO (Offline)';
+                        textStatus.style.color = 'yellow';
 
-} else {
-    iconElement.classList.add('status-unreachable');
-    textStatus.innerText = 'UNREACHABLE';
-    textStatus.style.color = 'red';
-}            })
-            .catch(err => console.error("Monitor Error:", err));
+                    } else {
+                        iconElement.classList.add('status-unreachable');
+                        textStatus.innerText = 'UNREACHABLE';
+                        textStatus.style.color = 'red';
+                    }
+                })
+                .catch(err => console.error("Monitor Error:", err));
         }
 
         updateStatus();
         setInterval(updateStatus, 15000);
-      }
+    }
 
-      // 5. Fix Rendering untuk memastikan map tidak abu-abu
-      setTimeout(() => {
+    // 🔥 FIX MAP RENDER
+    setTimeout(() => {
         mapHome.invalidateSize();
-      }, 300);
+    }, 300);
+
+
+    // =========================================
+    // 🔥 CONTROL MAP INTERACTION (INI YANG LO MAU)
+    // =========================================
+
+    const mapContainer = document.getElementById('map-home');
+    const overlay = document.getElementById('map-overlay');
+
+    // 👉 AKTIFKAN MAP SAAT KLIK
+    function enableMap() {
+        mapHome.scrollWheelZoom.enable();
+        mapHome.dragging.enable();
+        mapHome.touchZoom.enable();
+        mapHome.doubleClickZoom.enable();
+        mapHome.boxZoom.enable();
+        mapHome.keyboard.enable();
+    }
+
+    // 👉 MATIKAN MAP
+    function disableMap() {
+        mapHome.scrollWheelZoom.disable();
+        mapHome.dragging.disable();
+        mapHome.touchZoom.disable();
+        mapHome.doubleClickZoom.disable();
+        mapHome.boxZoom.disable();
+        mapHome.keyboard.disable();
+    }
+
+    // Klik overlay → aktif
+    overlay.addEventListener('click', function () {
+        overlay.style.display = 'none';
+        enableMap();
     });
 
+    // Klik map → aktif juga
+    mapContainer.addEventListener('click', function () {
+        overlay.style.display = 'none';
+        enableMap();
+    });
+
+    // Mouse keluar → disable lagi + munculin overlay
+    mapContainer.addEventListener('mouseleave', function () {
+        disableMap();
+        overlay.style.display = 'flex';
+    });
+
+});
     // Edit Site: Mapping data ke modal edit
     document.addEventListener('DOMContentLoaded', function () {
       const editButtons = document.querySelectorAll(
