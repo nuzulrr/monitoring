@@ -26,7 +26,7 @@ return new class extends Migration
         // koordinat map
         $table->decimal('latitude', 10, 6);
         $table->decimal('longitude', 10, 6);
-        $table->string('ip_address');
+        $table->string('ip_address')->unique();
         $table->text('note')->nullable();
         $table->date('tgl_instalasi');
 

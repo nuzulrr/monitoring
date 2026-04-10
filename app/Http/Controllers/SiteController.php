@@ -18,7 +18,7 @@ public function index()
 
     return view('layouts.app', [
         'projek' => $projek,
-        'sites' => $site // Saya ganti namanya jadi 'sites' agar lebih jamak
+        'sites' => $site 
     ]);
 }
 public function store(Request $request)
@@ -29,9 +29,10 @@ public function store(Request $request)
         'alamat'         => 'required|string|max:255',
         'latitude'       => 'required|numeric',
         'longitude'      => 'required|numeric',
-        'ip_address'     => 'required|ip',
+        'ip_address'     => 'required|ip|unique:site,ip_address',
         'note'           => 'nullable|string',
         'tgl_instalasi'  => 'required|date' 
+
     ]);
 
     Site::create($request->all());
