@@ -92,6 +92,22 @@ public function destroy($id_site)
     }
 }
 
+public function show($id_site)
+{
+    $site = Site::with('projek_ref')->where('id_site', $id_site)->first();
+
+    if (!$site) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Data tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $site
+    ]);
+}
 public function checkStatus(Request $request)
 {
     $ip = $request->query('ip');

@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/site', [SiteController::class, 'store'])->name('site.store');
     Route::put('/sites/{id_site}', [SiteController::class, 'update'])->name('sites.update');
     Route::delete('/sites/{id_site}', [SiteController::class, 'destroy'])->name('sites.destroy');
-
+    Route::get('/sites/{id_site}', [SiteController::class, 'show'])->name('sites.show');
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
