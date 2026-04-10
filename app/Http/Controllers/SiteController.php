@@ -74,21 +74,30 @@ public function update(Request $request, $id_site)
             return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
-public function destroy($id_site)
+public function destroy($id)
 {
     try {
-        $site = Site::where('id_site', $id_site)->firstOrFail();
+        // Kita paksa cari berdasarkan kolom id_site
+        $site = Site::where('id_site', $id)->first();
+
+        if (!$site) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data dengan ID ' . $id . ' tidak ditemukan.'
+            ], 404);
+        }
+
         $site->delete();
 
-        // Respon JSON untuk ditangkap JavaScript
         return response()->json([
             'success' => true,
-            'message' => 'Data berhasil dihapus dari sistem.'
+            'message' => 'Site berhasil dihapus'
         ]);
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Terjadi kesalahan pada server.'
+            'message' => 'Gagal hapus: ' . $e->getMessage()
         ], 500);
     }
 }

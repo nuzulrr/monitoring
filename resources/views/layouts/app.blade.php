@@ -453,7 +453,7 @@
                               </script>
 
                               <button type="button" class="btn btn-outline-danger border-0 btn-delete-trigger"
-                                data-id="{{ $s->id_site }}" data-ip="{{ $s->ip_address }}">
+                                data-id="{{ $s->id_site }}" >
                                 <i class="ph ph-trash f-18"></i>
                               </button>
                             </div>
@@ -779,13 +779,15 @@
       document.getElementById('formLokasi').submit();
     }
 
-
+let mapHome; 
+let markerInstances = {}; 
+let activeIntervals = {};
 
     // Peta Home: Menampilkan semua site dengan status real-time
     document.addEventListener('DOMContentLoaded', function () {
 
       // 🔥 INIT MAP (SEMUA INTERAKSI DIMATIKAN)
-      const mapHome = L.map('map-home', {
+       mapHome = L.map('map-home', {
         scrollWheelZoom: false,
         dragging: false,
         touchZoom: false,
@@ -816,9 +818,7 @@
               html: ''
             });
 
-            const marker = L.marker([lat, lng], {
-              icon: customIcon
-            }).addTo(mapHome);
+            const marker = L.marker([lat, lng], { icon: customIcon }).addTo(mapHome);
 
             markerInstances[item.id_site] = marker;
 
@@ -990,70 +990,81 @@
     });
 
     // Delete Site dengan SweetAlert2 dan Fetch API
-    document.addEventListener('DOMContentLoaded', function () {
-      const deleteButtons = document.querySelectorAll('.btn-delete-trigger');
+document.addEventListener('DOMContentLoaded', function () {
+    // Gunakan event delegation supaya lebih aman jika ada penambahan baris dinamis
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-delete-trigger');
+        if (!btn) return;
 
-      deleteButtons.forEach(button => {
-        button.addEventListener('click', function () {
-          const idSite = this.dataset.id;
-          const ipAddr = this.dataset.ip;
-          const targetRow = document.getElementById(`site-row-${idSite}`);
+        const idSite = btn.dataset.id;
+        const ipAddr = btn.dataset.ip || 'Site';
+        const targetRow = document.getElementById(`site-row-${idSite}`);
 
-          Swal.fire({
+        Swal.fire({
             title: 'Hapus Monitoring?',
-            text: `IP ${ipAddr} akan dihapus tanpa refresh halaman!`,
+            text: `IP ${ipAddr} akan dihapus dari peta & tabel secara permanen!`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
             confirmButtonText: 'Ya, Hapus!',
             cancelButtonText: 'Batal',
-            showLoaderOnConfirm: true, // Menampilkan loading di dalam tombol Ya
+            showLoaderOnConfirm: true,
             preConfirm: () => {
-              // Mengirim request ke backend menggunakan Fetch API
-              return fetch(`/sites/${idSite}`, {
-                method: 'DELETE',
-                headers: {
-                  'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json'
-                }
-              })
+                return fetch(`${window.location.origin}/site/${idSite}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
                 .then(response => {
-                  if (!response.ok) throw new Error(
-                    'Gagal menghapus data di server'
-                  );
-                  return response.json();
+                    if (!response.ok) {
+                        // Jika 404, berarti ID salah atau Route belum di-clear
+                        throw new Error('Server merespon error (Cek Route/Controller)');
+                    }
+                    return response.json();
                 })
                 .catch(error => {
-                  Swal.showValidationMessage(
-                    `Error: ${error}`);
+                    Swal.showValidationMessage(`Gagal: ${error.message}`);
                 });
             },
             allowOutsideClick: () => !Swal.isLoading()
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Animasi menghilang sebelum baris dihapus
-              targetRow.style.transition = "all 0.6s ease";
-              targetRow.style.opacity = "0";
-              targetRow.style.transform = "translateX(50px)";
+        }).then((result) => {
+         
+if (result.isConfirmed) {
+    
+    // 🔥 INI YANG BIKIN REALTIME HILANG DARI PETA
+    if (markerInstances[idSite]) {
+        console.log("Marker ditemukan, menghapus dari peta...");
+        
+        // Hapus dari tampilan peta
+        mapHome.removeLayer(markerInstances[idSite]); 
+        
+        // Hapus dari daftar memori
+        delete markerInstances[idSite]; 
+    }
 
-              setTimeout(() => {
-                targetRow.remove(); // Hapus dari HTML
+    // Hentikan monitoring IP agar tidak error di console
+    if (activeIntervals[idSite]) {
+        clearInterval(activeIntervals[idSite]);
+        delete activeIntervals[idSite];
+    }
 
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Terhapus!',
-                  text: 'Baris telah dihapus secara realtime.',
-                  timer: 1500,
-                  showConfirmButton: false
-                });
-              }, 600);
-            }
-          });
+    // Hapus baris tabel secara realtime
+    if (targetRow) {
+        targetRow.style.transition = "all 0.5s ease";
+        targetRow.style.opacity = "0";
+        targetRow.style.transform = "translateX(50px)";
+        setTimeout(() => targetRow.remove(), 500);
+    }
+
+    Swal.fire({ icon: 'success', title: 'Terhapus!', timer: 1000, showConfirmButton: false });
+}
         });
-      });
     });
-    // Realtime Status Check JS
+});    // Realtime Status Check JS
     const sites = @json($sites);
 
     async function updateRealtimeStatus() {
