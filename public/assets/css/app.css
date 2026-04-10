@@ -260,3 +260,10 @@
     50% { opacity: 0.4; }
     100% { opacity: 1; }
 }
+#map-edit {
+        height: 350px;
+        width: 100%;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        z-index: 1;
+    }

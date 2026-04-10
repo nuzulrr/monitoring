@@ -14,7 +14,7 @@ public function index()
       $projek = Projek::all(); 
 
     // Mengambil semua data site beserta relasi proyeknya untuk tabel IP
-    $site = Site::with('projek')->get();
+    $site = Site::with('projek_ref')->get();
 
     return view('layouts.app', [
         'projek' => $projek,
@@ -25,6 +25,7 @@ public function store(Request $request)
 {
     $request->validate([
         'id_projek'      => 'required|exists:projek,id_projek',
+        'projek'    => 'required|string|max:255',
         'alamat'         => 'required|string|max:255',
         'latitude'       => 'required|numeric',
         'longitude'      => 'required|numeric',
@@ -42,6 +43,7 @@ public function update(Request $request, $id_site)
         // Validasi input sesuai schema di gambar
         $request->validate([
             'id_projek'     => 'required|exists:projek,id_projek',
+            'projek'    => 'required|string|max:255',
             'ip_address'    => 'required|ip',
             'alamat'        => 'required|string',
             'latitude'      => 'required|numeric',
@@ -57,6 +59,7 @@ public function update(Request $request, $id_site)
             // Update data
             $site->update([
                 'id_projek'     => $request->id_projek,
+                'projek'        => $request->projek,
                 'ip_address'    => $request->ip_address,
                 'alamat'        => $request->alamat,
                 'latitude'      => $request->latitude,

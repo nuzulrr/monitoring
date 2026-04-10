@@ -13,6 +13,7 @@ class Site extends Model
 
     protected $fillable = [
         'id_projek',
+        'projek',
         'alamat',
         'latitude',
         'longitude',
@@ -21,7 +22,7 @@ class Site extends Model
         'tgl_instalasi'
     ];
 
-  public function projek()
+  public function projek_ref()
     {
         return $this->belongsTo(\App\Models\Projek::class, 'id_projek');
     }

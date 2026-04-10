@@ -20,6 +20,7 @@ return new class extends Migration
               ->onDelete('cascade');
 
         $table->string('alamat');
+        $table->string('projek');
 
 
         // koordinat map
