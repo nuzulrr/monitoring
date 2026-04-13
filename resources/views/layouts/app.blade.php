@@ -107,6 +107,8 @@
                             data-bs-target="#modalLokasi">
                             Tambah Site
                         </button>
+
+                        <!-- MODAL TAMBAH SITE -->
                         <div class="modal fade" id="modalLokasi" tabindex="-1">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
