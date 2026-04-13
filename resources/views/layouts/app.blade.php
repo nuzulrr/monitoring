@@ -94,26 +94,20 @@
               All Project
             </button>
 
-          @foreach ($kategori as $item)
-            <button type="button" class="top-nav-btn" data-kategori="{{ $item }}">
-              @if($item == 1)
-                Coklat
-              @elseif($item == 2)
-                Hijau
-              @elseif($item == 3)
-                Loreng
-              @endif
-            </button>
-          @endforeach
-          </div>
-          <div class="ms-2 ps-3 d-flex">
-            <button type="button" class="btn btn-success btn-add-action me-2" data-bs-toggle="modal"
-              data-bs-target="#modalLokasi">
-              Tambah Site
-            </button>
-            <div class="modal fade" id="modalLokasi" tabindex="-1">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                        @foreach ($projek as $item)
+                        <button type="button" class="top-nav-btn" data-id="{{ $item->id_projek }}">
+                            {{ $item->nama_projek }}
+                        </button>
+                        @endforeach
+                    </div>
+                    <div class="ms-2 ps-3 d-flex">
+                        <button type="button" class="btn btn-success btn-add-action me-2" data-bs-toggle="modal"
+                            data-bs-target="#modalLokasi">
+                            Tambah Site
+                        </button>
+                        <div class="modal fade" id="modalLokasi" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
 
                   <div class="modal-header">
                     <h5 class="modal-title">Tambah Lokasi</h5>
