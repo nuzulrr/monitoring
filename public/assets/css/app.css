@@ -267,3 +267,47 @@
         border: 2px solid #e9ecef;
         z-index: 1;
     }
+/* DEFAULT (CHECKING) */
+.node-glow {
+    width: 10px;
+    height: 10px;
+    background: gray;
+    border-radius: 50%;
+    box-shadow:
+        0 0 6px gray,
+        0 0 12px gray,
+        0 0 20px gray;
+}
+
+/* 🟢 ONLINE */
+.node-online {
+    background: #00ff9c;
+    box-shadow:
+        0 0 6px #00ff9c,
+        0 0 12px #00ff9c,
+        0 0 20px #00ff9c;
+}
+
+/* 🟡 RTO / OFFLINE */
+.node-offline {
+    background: #ffaa00;
+    animation: blink-fast 1.5s infinite;
+    box-shadow:
+        0 0 6px #ffaa00,
+        0 0 12px #ffaa00,
+        0 0 20px #ffaa00;
+}
+
+/* 🔴 UNREACHABLE */
+.node-unreachable {
+    background: #ff3b3b;
+    animation: blink-fast 0.5s infinite;
+    box-shadow:
+        0 0 6px #ff3b3b,
+        0 0 12px #ff3b3b,
+        0 0 20px #ff3b3b;
+}
+/* 🔥 OPTIONAL: BACKGROUND BIAR FUTURISTIK */
+#map-home {
+    background: radial-gradient(circle at center, #001018, #000814);
+}
