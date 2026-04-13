@@ -15,6 +15,7 @@ class Site extends Model
         'id_projek',
         'projek',
         'alamat',
+        'kategori',
         'latitude',
         'longitude',
         'ip_address',

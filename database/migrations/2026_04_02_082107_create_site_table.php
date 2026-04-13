@@ -27,6 +27,7 @@ return new class extends Migration
         $table->decimal('latitude', 10, 6);
         $table->decimal('longitude', 10, 6);
         $table->string('ip_address')->unique();
+        $table->enum('kategori', ['1', '2', '3']); // 1: coklat, 2: hijau, 3: oren
         $table->text('note')->nullable();
         $table->date('tgl_instalasi');
 

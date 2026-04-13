@@ -11,10 +11,12 @@ class SiteController extends Controller
 {
 public function index()
 {
-      $projek = Projek::all(); 
+    $projek = Projek::all(); 
 
-    // Mengambil semua data site beserta relasi proyeknya untuk tabel IP
-    $site = Site::with('projek_ref')->get();
+   
+    $site = Site::with('projek_ref')
+                ->orderBy('id_site', 'desc')
+                ->get();
 
     return view('layouts.app', [
         'projek' => $projek,
@@ -24,20 +26,30 @@ public function index()
 public function store(Request $request)
 {
     $request->validate([
-        'id_projek'      => 'required|exists:projek,id_projek',
-        'projek'    => 'required|string|max:255',
-        'alamat'         => 'required|string|max:255',
-        'latitude'       => 'required|numeric',
-        'longitude'      => 'required|numeric',
-        'ip_address'     => 'required|ip|unique:site,ip_address',
-        'note'           => 'nullable|string',
-        'tgl_instalasi'  => 'required|date' 
-
+        'id_projek'     => 'required|exists:projek,id_projek',
+        'kategori'      => 'required|in:1,2,3',
+        'projek'        => 'required|string|max:255',
+        
+        // Aturan 'ip' dihapus agar bisa menerima Hostname/Domain
+        // Tetap 'unique' agar tidak ada duplikasi alamat perangkat
+        'ip_address'    => 'required|string|max:255|unique:site,ip_address', 
+        
+        'tgl_instalasi' => 'required|date',
+        'alamat'        => 'required|string',
+        'latitude'      => 'required|numeric',
+        'longitude'     => 'required|numeric',
+        'note'          => 'nullable|string',
+    ], [
+        'ip_address.unique' => 'Alamat IP/Hostname ini sudah terdaftar!',
+        'required'          => 'Kolom :attribute wajib diisi!',
     ]);
 
-    Site::create($request->all());
-
-    return redirect()->back()->with('success', 'Site berhasil disimpan');
+    try {
+        \App\Models\Site::create($request->all());
+        return redirect()->back()->with('success', 'Site berhasil disimpan!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
+    }
 }
 public function update(Request $request, $id_site)
     {
@@ -46,6 +58,7 @@ public function update(Request $request, $id_site)
             'id_projek'     => 'required|exists:projek,id_projek',
             'projek'    => 'required|string|max:255',
             'ip_address'    => 'required|ip',
+            'kategori'      => 'required|in:1,2,3',
             'alamat'        => 'required|string',
             'latitude'      => 'required|numeric',
             'longitude'     => 'required|numeric',
@@ -62,6 +75,7 @@ public function update(Request $request, $id_site)
                 'id_projek'     => $request->id_projek,
                 'projek'        => $request->projek,
                 'ip_address'    => $request->ip_address,
+                'kategori'      => $request->kategori,
                 'alamat'        => $request->alamat,
                 'latitude'      => $request->latitude,
                 'longitude'     => $request->longitude,
