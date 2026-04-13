@@ -13,17 +13,19 @@ public function index()
 {
     $projek = Projek::all(); 
 
-   
     $site = Site::with('projek_ref')
                 ->orderBy('id_site', 'desc')
                 ->get();
 
+    // ✅ TAMBAH INI
+    $kategori = Site::select('kategori')->distinct()->pluck('kategori');
+
     return view('layouts.app', [
         'projek' => $projek,
-        'sites' => $site 
+        'sites' => $site,
+        'kategori' => $kategori // WAJIB ADA
     ]);
-}
-public function store(Request $request)
+}public function store(Request $request)
 {
     $request->validate([
         'id_projek'     => 'required|exists:projek,id_projek',
