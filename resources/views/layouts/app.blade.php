@@ -206,8 +206,10 @@
                                         document.addEventListener('DOMContentLoaded', function () {
                                             // --- 1. INISIALISASI PETA ---
                                             const map = L.map('map').setView([-6.200000, 106.816666], 13);
-                                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-                                                .addTo(map);
+                                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                attribution: '&copy; OpenStreetMap contributors'
+                                            }).addTo(map);
+
                                             let marker = L.marker([-6.200000, 106.816666], {
                                                 draggable: true
                                             }).addTo(map);
@@ -216,65 +218,73 @@
                                             const inputLat = document.getElementById('lat');
                                             const inputLng = document.getElementById('lng');
 
-                                            function updateLocation(lat, lng, address = null) {
+                                            // Fungsi helper untuk mengisi input form
+                                            function updateLocationFields(lat, lng, address = null) {
                                                 inputLat.value = lat.toFixed(8);
                                                 inputLng.value = lng.toFixed(8);
-                                                if (address) inputAlamat.value = address;
+
+                                                if (address) {
+                                                    inputAlamat.value = address;
+                                                } else {
+                                                    // Jika alamat belum ada, ambil dari API (Reverse Geocoding)
+                                                    fetch(
+                                                            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+                                                        )
+                                                        .then(res => res.json())
+                                                        .then(data => {
+                                                            inputAlamat.value = data.display_name ||
+                                                                "Alamat tidak ditemukan";
+                                                        })
+                                                        .catch(err => {
+                                                            inputAlamat.value = "Gagal mengambil alamat";
+                                                        });
+                                                }
                                             }
 
-                                            // Ambil alamat saat peta diklik
-                                            map.on('click', (e) => {
+                                            // --- 2. FITUR SEARCH (GEOCODER) ---
+                                            const searchControl = L.Control.geocoder({
+                                                query: "",
+                                                placeholder: "Cari lokasi site...",
+                                                defaultMarkGeocode: false
+                                            }).on('markgeocode', function (e) {
+                                                const latlng = e.geocode.center;
+                                                const address = e.geocode.name;
+
+                                                map.setView(latlng, 16);
+                                                marker.setLatLng(latlng);
+                                                updateLocationFields(latlng.lat, latlng.lng, address);
+                                            }).addTo(map);
+
+                                            // --- 3. KLIK PETA UNTUK AUTOFILL ---
+                                            map.on('click', function (e) {
+                                                const lat = e.latlng.lat;
+                                                const lng = e.latlng.lng;
+
+                                                // Pindahkan marker ke titik klik
                                                 marker.setLatLng(e.latlng);
-                                                fetch(
-                                                        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
-                                                    )
-                                                    .then(res => res.json())
-                                                    .then(data => updateLocation(e.latlng.lat, e.latlng
-                                                        .lng, data.display_name));
+
+                                                // Tampilkan loading sementara di input alamat agar user tahu sedang memproses
+                                                inputAlamat.value = "Sedang mengambil alamat...";
+
+                                                // Ambil alamat otomatis berdasarkan titik klik
+                                                updateLocationFields(lat, lng);
                                             });
 
-                                            // --- FIX MODAL: Peta Abu-abu & Input Null ---
+                                            // --- 4. DRAG MARKER UNTUK AUTOFILL ---
+                                            marker.on('dragend', function (e) {
+                                                const position = marker.getLatLng();
+                                                inputAlamat.value = "Sedang mengambil alamat...";
+                                                updateLocationFields(position.lat, position.lng);
+                                            });
+
+                                            // --- FIX MODAL: Agar peta tidak abu-abu saat dibuka ---
                                             const myModal = document.getElementById('modalLokasi');
                                             if (myModal) {
                                                 myModal.addEventListener('shown.bs.modal', function () {
-                                                    map.invalidateSize(); // Perbaiki tampilan peta
-                                                    // Paksa input manual kosong agar teks "null" hilang total
-                                                    document.getElementById('input-projek-manual')
-                                                        .value = '';
+                                                    map.invalidateSize();
                                                 });
                                             }
                                         });
-
-                                        // --- 3. FUNGSI Save DENGAN LOADING & SWAL ---
-                                        function confirmSaveLokasi() {
-                                            const form = document.getElementById('formLokasi');
-                                            const btn = document.getElementById('btnSave');
-                                            const text = document.getElementById('textSave');
-                                            const loading = document.getElementById('loadingSave');
-
-                                            if (!form.checkValidity()) {
-                                                form.reportValidity();
-                                                return;
-                                            }
-
-                                            Swal.fire({
-                                                title: 'Save Data Site?',
-                                                icon: 'question',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Ya, Save',
-                                                cancelButtonText: 'Cancel'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    // Jalankan Efek Loading
-                                                    btn.disabled = true;
-                                                    text.innerText = 'Menyimpan...';
-                                                    loading.classList.remove('d-none');
-
-                                                    // Kirim Data
-                                                    form.submit();
-                                                }
-                                            });
-                                        }
 
                                     </script>
                                 </div>
@@ -457,14 +467,16 @@
                                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                     <table class="table table-ip mb-0">
                                         <thead>
-                                            <tr>
-                                                <th class="ps-4">Project</th>
+                                            <tr class="text-center">
+                                                <th>Project</th>
                                                 <th>IP Public</th>
-                                                <th class="text-center">Instansi</th>
-                                                <th class="text-center">Time</th>
-                                                <th class="text-center">Status</th>
+                                                <th>Instansi</th>
+                                                <th>Status</th>
                                                 <th>Alamat</th>
-                                                <th class="text-center">Aksi</th>
+                                                <th>Tanggal Instalasi</th>
+                                                <th>Note</th>
+                                                <th>Tanggal diupdate</th>
+                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
 
@@ -484,17 +496,34 @@
                                                     {{ $s->kategori == '1' ? 'Coklat' : ($s->kategori == '2' ? 'Hijau' : ($s->kategori == '3' ? 'Loreng' : '-')) }}
                                                 </td>
 
-                                                <td class="text-center">
-                                                    <strong id="ping-value-{{ $ipId }}" class="text-info">--</strong>
-                                                    <small class="text-muted">ms</small>
+                                                <td class="text-center"
+                                                    style="min-width: 120px; vertical-align: middle;">
+                                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                                        <div class="d-flex align-items-baseline">
+                                                            <strong id="ping-value-{{ $ipId }}"
+                                                                class="text-info fs-6">--</strong>
+                                                            <small class="text-muted ms-1"
+                                                                style="font-size: 10px;">ms</small>
+                                                        </div>
+
+                                                        <div id="dot-{{ $ipId }}" class="status-pill warning"
+                                                            style="width: 12px; height: 12px;"></div>
+                                                    </div>
                                                 </td>
 
-                                                <td class="text-center">
-                                                    <div id="dot-{{ $ipId }}" class="status-pill warning"></div>
-                                                </td>
+
 
                                                 <td class="text-white">
                                                     {{ $s->alamat ?? '-' }}
+                                                </td>
+                                                <td class="text-center text-center">
+                                                    {{ $s->tgl_instalasi ? \Carbon\Carbon::parse($s->tgl_instalasi)->format('d M Y') : '-' }}
+                                                </td>
+                                                <td class="text-center text-white">
+                                                    {{ $s->note ?? '-' }}
+                                                </td>
+                                                <td class="text-center text-white">
+                                                    {{ $s->updated_at ? \Carbon\Carbon::parse($s->updated_at)->format('d M Y H:i:s') : '-' }}
                                                 </td>
 
                                                 <td class="text-center">
@@ -621,279 +650,369 @@
 
                     <!-- 🔥 SYSTEM STATUS (KECIL DI SAMPING) -->
                     <div class="col-xl-3 col-lg-4">
-                        <div class="card border-0 h-100 d-flex justify-content-center"
-                            style="background-color: #f8f9fa; border-radius: 12px;">
-
-                            <div class="card-body text-center">
-                                <h6 class="text-dark fw-bold mb-4 d-flex align-items-center justify-content-center">
+                        <div class="card border-0 mb-3" style="background-color: #f8f9fa; border-radius: 12px;">
+                            <div class="card-body text-center p-3">
+                                <h6 class="text-dark fw-bold mb-3 d-flex align-items-center justify-content-center"
+                                    style="font-size: 14px;">
                                     <span class="bg-danger me-2"
                                         style="width: 4px; height: 14px; border-radius: 2px;"></span>
                                     System Status
                                 </h6>
-
                                 <div class="d-flex justify-content-around">
-
                                     <div>
-                                        <div class="status-ring ring-success mb-2">
+                                        <div class="status-ring ring-success mb-1" style="width: 30px; height: 30px;">
                                             <div class="status-dot dot-success"></div>
                                         </div>
-                                        <span class="text-success small fw-bold">Connect</span>
+                                        <span class="text-success fw-bold" style="font-size: 10px;">Connect</span>
                                     </div>
-
                                     <div>
-                                        <div class="status-ring ring-danger mb-2">
+                                        <div class="status-ring ring-warning mb-1" style="width: 30px; height: 30px;">
+                                            <div class="status-dot dot-warning"></div>
+                                        </div>
+                                        <span class="text-warning fw-bold" style="font-size: 10px;">Timeout</span>
+                                    </div>
+                                    <div>
+                                        <div class="status-ring ring-danger mb-1" style="width: 30px; height: 30px;">
                                             <div class="status-dot dot-danger"></div>
                                         </div>
-                                        <span class="text-danger small fw-bold">Error</span>
+                                        <span class="text-danger fw-bold" style="font-size: 10px;">Unreachable</span>
                                     </div>
-
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 12px;">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="text-dark fw-bold m-0 d-flex align-items-center"
+                                        style="font-size: 14px;">
+                                        <span class="bg-primary me-2"
+                                            style="width: 4px; height: 14px; border-radius: 2px;"></span>
+                                        Projects List
+                                    </h6>
+                                    <span class="badge rounded-pill bg-primary" style="font-size: 10px;">
+                                        Total: {{ $totalSites ?? 0 }} Sites
+                                    </span>
+                                </div>
+
+                                <div class="d-flex flex-column gap-2">
+                                    @foreach($projek as $p)
+                                    <div class="card border-0 shadow-sm"
+                                        style="border-radius: 8px; background-color: #ffffff; overflow: visible;">
+                                        <div
+                                            class="card-body p-2 px-3 d-flex align-items-center justify-content-between">
+                                            <div style="min-width: 0; flex: 1;">
+                                                <span class="fw-bold text-dark d-block text-truncate"
+                                                    style="font-size: 12px;" title="{{ $p->nama_projek }}">
+                                                    {{ $p->nama_projek }}
+                                                </span>
+                                                <span class="text-muted fw-bold" style="font-size: 10px;">
+                                                    {{ $p->sites_count ?? 0 }} Sites
+                                                </span>
+                                            </div>
+
+                                            <div class="ms-2">
+                                                <button type="button"
+                                                    onclick="deleteProject('{{ $p->id_projek }}', '{{ $p->nama_projek }}')"
+                                                    class="btn btn-link text-danger p-1 border-0 shadow-none d-flex align-items-center justify-content-center"
+                                                    style="width: 30px; height: 30px; position: relative; z-index: 10;">
+                                                    <i class="bi bi-trash3-fill" style="font-size: 1.1rem;"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                @if($projek->isEmpty())
+                                <div class="text-center py-2 text-muted small">No data.</div>
+                                @endif
                             </div>
                         </div>
                     </div>
 
-                </div>
-                <div class="modal fade" id="modalEdit" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title">Edit Lokasi Site</h5>
-                                <button type="button" class="btn-close btn-close-white"
-                                    data-bs-dismiss="modal"></button>
-                            </div>
-                            <form id="formEdit" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label>Projek</label>
-                                            <select name="id_projek" id="edit-id-projek" class="form-control">
-                                                @foreach($projek as $p)
-                                                <option value="{{ $p->id_projek }}">{{ $p->nama_projek }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>Nama Site</label>
-                                            <input type="text" name="projek" id="edit-projek-manual"
-                                                class="form-control">
-                                        </div>
-                                    </div>
+                    <form id="delete-form" action="" method="POST" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
 
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label>Kategori</label>
-                                            <select name="kategori" id="edit-kategori" class="form-control">
-                                                <option value="1">Coklat</option>
-                                                <option value="2">Hijau</option>
-                                                <option value="3">Loreng</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>IP Public</label>
-                                            <input type="text" name="ip_address" id="edit-ip-address"
-                                                class="form-control">
-                                            <div id="ip-feedback" class="small mt-1"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label>Alamat</label>
-                                        <textarea name="alamat" id="edit-alamat" class="form-control"
-                                            rows="2"></textarea>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label>Tanggal Instalasi</label>
-                                            <input type="date" name="tgl_instalasi" id="edit-tgl" class="form-control">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label>Note</label>
-                                            <input type="text" name="note" id="edit-note" class="form-control">
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col"><input type="text" name="latitude" id="edit-lat"
-                                                class="form-control bg-light" readonly></div>
-                                        <div class="col"><input type="text" name="longitude" id="edit-lng"
-                                                class="form-control bg-light" readonly></div>
-                                    </div>
-
-                                    <div id="map-edit"
-                                        style="height:300px; border-radius: 8px; border: 1px solid #ddd;"></div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" id="btn-save-edit" class="btn btn-primary">Save
-                                        Perubahan</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <script>
-                    let editMap, editMarker;
-                    const modalEditEl = document.getElementById('modalEdit');
-                    const inputIp = document.getElementById('edit-ip-address');
-                    const ipFeedback = document.getElementById('ip-feedback');
-                    const inputAlamat = document.getElementById('edit-alamat');
-                    const btnSave = document.getElementById('btn-save-edit');
-                    const formEdit = document.getElementById('formEdit');
-
-                    // 1. Fungsi Ambil Alamat Otomatis
-                    function fetchAddress(lat, lng) {
-                        inputAlamat.value = "Mencari alamat...";
-                        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                inputAlamat.value = data.display_name || "Alamat tidak ditemukan";
-                            })
-                            .catch(() => {
-                                inputAlamat.value = "Gagal mengambil alamat otomatis";
+                    <script>
+                        function deleteProject(id, name) {
+                            Swal.fire({
+                                title: 'Hapus?',
+                                text: `Projek "${name}" akan dihapus.`,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#dc3545',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Hapus',
+                                cancelButtonText: 'Batal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const form = document.getElementById('delete-form');
+                                    form.action = `/projek/${id}`;
+                                    form.submit();
+                                }
                             });
-                    }
-
-                    // 2. Event Tombol Edit (Inisialisasi Modal)
-                    document.querySelectorAll('.btn-edit').forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            const d = this.dataset;
-                            formEdit.action = `/sites/${d.id}`;
-                            modalEditEl.dataset.id = d.id;
-                            modalEditEl.dataset.lat = d.lat;
-                            modalEditEl.dataset.lng = d.lng;
-
-                            document.getElementById('edit-id-projek').value = d.projek_id;
-                            document.getElementById('edit-projek-manual').value = (d.projek_val ===
-                                'null') ? '' : d.projek_val;
-                            document.getElementById('edit-kategori').value = d.kategori || '';
-                            inputIp.value = (d.ip === 'null') ? '' : d.ip;
-                            inputAlamat.value = (d.alamat === 'null') ? '' : d.alamat;
-                            document.getElementById('edit-tgl').value = d.tgl;
-                            document.getElementById('edit-note').value = (d.note === 'null' || !d
-                                .note) ? '' : d.note;
-                            document.getElementById('edit-lat').value = d.lat;
-                            document.getElementById('edit-lng').value = d.lng;
-
-                            inputIp.classList.remove('is-invalid', 'is-valid');
-                            ipFeedback.innerText = "";
-                            btnSave.disabled = false;
-                        });
-                    });
-
-                    formEdit.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    // 1. Tutup modal segera
-    const modalInstance = bootstrap.Modal.getInstance(modalEditEl);
-    if (modalInstance) modalInstance.hide();
-
-    Swal.fire({
-        title: 'Konfirmasi Perubahan',
-        text: "Save data ini?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Save!',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Menyimpan...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-
-            const formData = new FormData(formEdit);
-            fetch(formEdit.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(async response => {
-                const data = await response.json();
-                if (response.ok) {
-                    Swal.fire('Berhasil!', 'Data telah diSave.', 'success')
-                        .then(() => { location.reload(); });
-                } else {
-                    // Jika validasi gagal (Error 422)
-                    let errorMsg = data.message || 'Terjadi kesalahan.';
-                    if (data.errors) errorMsg = Object.values(data.errors).flat().join("<br>");
-                    
-                    Swal.fire('Gagal!', errorMsg, 'error').then(() => {
-                        modalInstance.show(); // Buka modal lagi untuk perbaikan
-                    });
-                }
-            })
-            .catch(error => {
-                // Ini yang menangkap "Gagal terhubung ke server" jika masih ada error 500
-                Swal.fire('Error!', 'Pastikan nama tabel di Controller sudah benar (site).', 'error')
-                    .then(() => { modalInstance.show(); });
-            });
-        } else {
-            modalInstance.show(); // Jika Cancel, balik ke modal
-        }
-    });
-});
-                    modalEditEl.addEventListener('shown.bs.modal', function () {
-                        const lat = parseFloat(this.dataset.lat) || -6.200;
-                        const lng = parseFloat(this.dataset.lng) || 106.816;
-
-                        if (!editMap) {
-                            editMap = L.map('map-edit').setView([lat, lng], 15);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(editMap);
-                            editMarker = L.marker([lat, lng], {
-                                draggable: true
-                            }).addTo(editMap);
-
-                            const syncLocation = (nLat, nLng) => {
-                                document.getElementById('edit-lat').value = nLat.toFixed(8);
-                                document.getElementById('edit-lng').value = nLng.toFixed(8);
-                                fetchAddress(nLat, nLng);
-                            };
-
-                            editMap.on('click', (e) => {
-                                editMarker.setLatLng(e.latlng);
-                                syncLocation(e.latlng.lat, e.latlng.lng);
-                            });
-
-                            editMarker.on('dragend', () => {
-                                const p = editMarker.getLatLng();
-                                syncLocation(p.lat, p.lng);
-                            });
-
-                            const geocoder = L.Control.geocoder({
-                                    defaultMarkGeocode: false,
-                                    placeholder: "Cari lokasi atau alamat...",
-                                    errorMessage: "Lokasi tidak ditemukan."
-                                })
-                                .on('markgeocode', function (e) {
-                                    const center = e.geocode.center;
-                                    editMarker.setLatLng(center);
-                                    editMap.setView(center, 15);
-                                    syncLocation(center.lat, center.lng);
-                                })
-                                .addTo(editMap);
-
-                        } else {
-                            editMap.setView([lat, lng], 15);
-                            editMarker.setLatLng([lat, lng]);
                         }
-                        setTimeout(() => {
-                            editMap.invalidateSize();
-                        }, 200);
-                    });
 
-                </script>
+                    </script>
+                    <div class="modal fade" id="modalEdit" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title">Edit Lokasi Site</h5>
+                                    <button type="button" class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"></button>
+                                </div>
+                                <form id="formEdit" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Projek</label>
+                                                <select name="id_projek" id="edit-id-projek" class="form-control">
+                                                    @foreach($projek as $p)
+                                                    <option value="{{ $p->id_projek }}">{{ $p->nama_projek }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>Nama Site</label>
+                                                <input type="text" name="projek" id="edit-projek-manual"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
 
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Kategori</label>
+                                                <select name="kategori" id="edit-kategori" class="form-control">
+                                                    <option value="1">Coklat</option>
+                                                    <option value="2">Hijau</option>
+                                                    <option value="3">Loreng</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>IP Public</label>
+                                                <input type="text" name="ip_address" id="edit-ip-address"
+                                                    class="form-control">
+                                                <div id="ip-feedback" class="small mt-1"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label>Alamat</label>
+                                            <textarea name="alamat" id="edit-alamat" class="form-control"
+                                                rows="2"></textarea>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Tanggal Instalasi</label>
+                                                <input type="date" name="tgl_instalasi" id="edit-tgl"
+                                                    class="form-control">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>Note</label>
+                                                <input type="text" name="note" id="edit-note" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col"><input type="text" name="latitude" id="edit-lat"
+                                                    class="form-control bg-light" readonly></div>
+                                            <div class="col"><input type="text" name="longitude" id="edit-lng"
+                                                    class="form-control bg-light" readonly></div>
+                                        </div>
+
+                                        <div id="map-edit"
+                                            style="height:300px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" id="btn-save-edit" class="btn btn-primary">Save
+                                            Perubahan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        let editMap, editMarker;
+                        const modalEditEl = document.getElementById('modalEdit');
+                        const inputIp = document.getElementById('edit-ip-address');
+                        const ipFeedback = document.getElementById('ip-feedback');
+                        const inputAlamat = document.getElementById('edit-alamat');
+                        const btnSave = document.getElementById('btn-save-edit');
+                        const formEdit = document.getElementById('formEdit');
+
+                        // 1. Fungsi Ambil Alamat Otomatis
+                        function fetchAddress(lat, lng) {
+                            inputAlamat.value = "Mencari alamat...";
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    inputAlamat.value = data.display_name || "Alamat tidak ditemukan";
+                                })
+                                .catch(() => {
+                                    inputAlamat.value = "Gagal mengambil alamat otomatis";
+                                });
+                        }
+
+                        // 2. Event Tombol Edit (Inisialisasi Modal)
+                        document.querySelectorAll('.btn-edit').forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const d = this.dataset;
+                                formEdit.action = `/sites/${d.id}`;
+                                modalEditEl.dataset.id = d.id;
+                                modalEditEl.dataset.lat = d.lat;
+                                modalEditEl.dataset.lng = d.lng;
+
+                                document.getElementById('edit-id-projek').value = d.projek_id;
+                                document.getElementById('edit-projek-manual').value = (d.projek_val ===
+                                    'null') ? '' : d.projek_val;
+                                document.getElementById('edit-kategori').value = d.kategori || '';
+                                inputIp.value = (d.ip === 'null') ? '' : d.ip;
+                                inputAlamat.value = (d.alamat === 'null') ? '' : d.alamat;
+                                document.getElementById('edit-tgl').value = d.tgl;
+                                document.getElementById('edit-note').value = (d.note === 'null' || !d
+                                    .note) ? '' : d.note;
+                                document.getElementById('edit-lat').value = d.lat;
+                                document.getElementById('edit-lng').value = d.lng;
+
+                                inputIp.classList.remove('is-invalid', 'is-valid');
+                                ipFeedback.innerText = "";
+                                btnSave.disabled = false;
+                            });
+                        });
+
+                        formEdit.addEventListener('submit', function (e) {
+                            e.preventDefault();
+
+                            // 1. Tutup modal segera
+                            const modalInstance = bootstrap.Modal.getInstance(modalEditEl);
+                            if (modalInstance) modalInstance.hide();
+
+                            Swal.fire({
+                                title: 'Konfirmasi Perubahan',
+                                text: "Save data ini?",
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, Save!',
+                                cancelButtonText: 'Cancel'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    Swal.fire({
+                                        title: 'Menyimpan...',
+                                        allowOutsideClick: false,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        }
+                                    });
+
+                                    const formData = new FormData(formEdit);
+                                    fetch(formEdit.action, {
+                                            method: 'POST',
+                                            body: formData,
+                                            headers: {
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                                'Accept': 'application/json'
+                                            }
+                                        })
+                                        .then(async response => {
+                                            const data = await response.json();
+                                            if (response.ok) {
+                                                Swal.fire('Berhasil!', 'Data telah diSave.',
+                                                        'success')
+                                                    .then(() => {
+                                                        location.reload();
+                                                    });
+                                            } else {
+                                                // Jika validasi gagal (Error 422)
+                                                let errorMsg = data.message ||
+                                                    'Terjadi kesalahan.';
+                                                if (data.errors) errorMsg = Object.values(data
+                                                    .errors).flat().join("<br>");
+
+                                                Swal.fire('Gagal!', errorMsg, 'error').then(
+                                                    () => {
+                                                        modalInstance
+                                                            .show(); // Buka modal lagi untuk perbaikan
+                                                    });
+                                            }
+                                        })
+                                        .catch(error => {
+                                            // Ini yang menangkap "Gagal terhubung ke server" jika masih ada error 500
+                                            Swal.fire('Error!',
+                                                    'Pastikan nama tabel di Controller sudah benar (site).',
+                                                    'error')
+                                                .then(() => {
+                                                    modalInstance.show();
+                                                });
+                                        });
+                                } else {
+                                    modalInstance.show(); // Jika Cancel, balik ke modal
+                                }
+                            });
+                        });
+                        modalEditEl.addEventListener('shown.bs.modal', function () {
+                            const lat = parseFloat(this.dataset.lat) || -6.200;
+                            const lng = parseFloat(this.dataset.lng) || 106.816;
+
+                            if (!editMap) {
+                                editMap = L.map('map-edit').setView([lat, lng], 15);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
+                                    editMap);
+                                editMarker = L.marker([lat, lng], {
+                                    draggable: true
+                                }).addTo(editMap);
+
+                                const syncLocation = (nLat, nLng) => {
+                                    document.getElementById('edit-lat').value = nLat.toFixed(8);
+                                    document.getElementById('edit-lng').value = nLng.toFixed(8);
+                                    fetchAddress(nLat, nLng);
+                                };
+
+                                editMap.on('click', (e) => {
+                                    editMarker.setLatLng(e.latlng);
+                                    syncLocation(e.latlng.lat, e.latlng.lng);
+                                });
+
+                                editMarker.on('dragend', () => {
+                                    const p = editMarker.getLatLng();
+                                    syncLocation(p.lat, p.lng);
+                                });
+
+                                const geocoder = L.Control.geocoder({
+                                        defaultMarkGeocode: false,
+                                        placeholder: "Cari lokasi atau alamat...",
+                                        errorMessage: "Lokasi tidak ditemukan."
+                                    })
+                                    .on('markgeocode', function (e) {
+                                        const center = e.geocode.center;
+                                        editMarker.setLatLng(center);
+                                        editMap.setView(center, 15);
+                                        syncLocation(center.lat, center.lng);
+                                    })
+                                    .addTo(editMap);
+
+                            } else {
+                                editMap.setView([lat, lng], 15);
+                                editMarker.setLatLng([lat, lng]);
+                            }
+                            setTimeout(() => {
+                                editMap.invalidateSize();
+                            }, 200);
+                        });
+
+                    </script>
+
+                </div>
             </div>
         </div>
-    </div>
     </div>
     <script>
         // Modal Lokasi: Inisialisasi Leaflet dan Interaksi  
@@ -1006,7 +1125,7 @@
             // SUBMIT
             document.getElementById('formLokasi').submit();
         }
-
+        // maphome
 
         let mapHome;
         let markerInstances = {}; // 🔥 GLOBAL (WAJIB)
@@ -1051,7 +1170,10 @@
                 });
 
                 const marker = L.marker([lat, lng], {
-                    icon: customIcon
+                    icon: L.divIcon({
+                        className: 'status-icon status-checking',
+                        html: ''
+                    })
                 }).addTo(mapHome);
 
                 // 🔥 Save GLOBAL
@@ -1077,7 +1199,64 @@
 
                 marker.bindPopup(popupContent);
                 markersCoordinates.push([lat, lng]);
+                if (item.ip_address) {
+                    startPing(item.id_site, item.ip_address);
+                }
             });
+
+            function startPing(siteId, ipAddress) {
+                if (activeIntervals[siteId]) clearInterval(activeIntervals[siteId]);
+
+                const performCheck = () => {
+                  const controller = new AbortController();
+                  const timeoutId = setTimeout(() => controller.abort(), 2000);
+                    // Panggil API Laravel Anda dengan parameter query 'ip'
+                    fetch(`/api/check-status?ip=${ipAddress}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const marker = markerInstances[siteId];
+                            if (!marker) return;
+
+                            let statusClass = 'status-unreachable'; // Default Merah
+                            let statusText = 'Offline';
+                            let textColor = '#dc3545';
+
+                            // Logika penentuan status berdasarkan response API Anda
+                            if (data.status === 'online') {
+                                statusClass = 'status-online'; // Hijau
+                                statusText = `Online`;
+                                textColor = '#198754';
+                            } else if (data.status === 'offline') {
+                                statusClass = 'status-timeout'; // Kuning (Timeout)
+                                statusText = 'Timeout';
+                                textColor = '#ffc107';
+                            }
+
+                            // 1. Update Icon Marker di Peta
+                            const newIcon = L.divIcon({
+                                className: `status-icon ${statusClass}`,
+                                html: ''
+                            });
+                            marker.setIcon(newIcon);
+
+                            // 2. Update Text Status di dalam Popup
+                            // Kita gunakan polling untuk cek apakah elemen status-text sudah ada di DOM
+                            const statusElement = document.getElementById(`status-text-${siteId}`);
+                            if (statusElement) {
+                                statusElement.innerText = statusText;
+                                statusElement.style.color = textColor;
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Error checking status:", err);
+                        });
+                };
+
+                // Jalankan pertama kali, lalu ulangi setiap 30 detik
+                performCheck();
+                activeIntervals[siteId] = setInterval(performCheck, 30000);
+            }
+
 
             // =========================
             // 🔥 AUTO FIT BOUNDS

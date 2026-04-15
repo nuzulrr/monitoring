@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <title>Register | Network Monitoring MTT</title>
     <meta charset="utf-8" />
@@ -8,8 +9,9 @@
     <meta name="author" content="Codedthemes" />
 
     <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon" />
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-    
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
     <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
 </head>
@@ -38,32 +40,45 @@
                             <h4 class="text-center f-w-500 mt-4 mb-3">Create Account</h4>
 
                             @if ($errors->any())
-                                <div class="alert alert-danger p-2 small">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
+                            <div class="alert alert-danger p-2 small">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                             @endif
 
                             <form action="{{ route('register') }}" method="POST">
                                 @csrf
                                 <div class="form-group mb-3">
-                                    <input type="text" name="name" class="form-control" placeholder="Full Name" value="{{ old('name') }}" required autofocus />
-                                </div>
-                                
-                                <div class="form-group mb-3">
-                                    <input type="email" name="email" class="form-control" placeholder="Email Address" value="{{ old('email') }}" required />
+                                    <input type="text" name="name" class="form-control" placeholder="Full Name"
+                                        value="{{ old('name') }}" required autofocus />
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <input type="password" name="password" class="form-control" placeholder="Password" required />
+                                    <input type="email" name="email" class="form-control" placeholder="Email Address"
+                                        value="{{ old('email') }}" required />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <div class="input-group">
+                                        <input type="password" name="secret_code" class="form-control"
+                                            placeholder="Secret Invitation Code" required />
+                                    </div>
+                                    <small class="text-muted">Hubungi administrator PT Media Touch Technology untuk
+                                        mendapatkan kode.</small>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <input type="password" name="password" class="form-control" placeholder="Password"
+                                        required />
                                     <small class="text-muted">Minimum 8 characters</small>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password" required />
+                                    <input type="password" name="password_confirmation" class="form-control"
+                                        placeholder="Confirm Password" required />
                                 </div>
 
                                 <div class="text-center mt-4">
@@ -91,6 +106,8 @@
     <script>
         layout_change('light');
         preset_change('preset-1');
+
     </script>
 </body>
+
 </html>

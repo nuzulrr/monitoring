@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/sites/{id_site}', [SiteController::class, 'update'])->name('sites.update');
     Route::delete('/site/{id}', [SiteController::class, 'destroy'])->name('site.destroy');
     Route::get('/sites/{id_site}', [SiteController::class, 'show'])->name('sites.show');
+    Route::delete('/projek/{id}', [ProjekController::class, 'destroy'])->name('projek.destroy');
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     

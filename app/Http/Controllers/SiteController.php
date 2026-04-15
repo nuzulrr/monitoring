@@ -11,19 +11,20 @@ class SiteController extends Controller
 {
     public function index()
     {
-        $projek = Projek::all();
+        $projek = Projek::withCount('sites')->get();
 
         $site = Site::with('projek_ref')
             ->orderBy('id_site', 'desc')
             ->get();
 
-        // ✅ TAMBAH INI
+        $totalSites = $projek->sum('sites_count');
         $kategori = Site::select('kategori')->distinct()->pluck('kategori');
 
         return view('layouts.app', [
             'projek' => $projek,
+            'totalSites' => $totalSites,
             'sites' => $site,
-            'kategori' => $kategori // WAJIB ADA
+            'kategori' => $kategori 
         ]);
     }
     public function store(Request $request)

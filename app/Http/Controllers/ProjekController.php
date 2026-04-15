@@ -16,4 +16,11 @@ class ProjekController extends Controller
 
         return redirect()->back()->with('success', 'Projek berhasil ditambahkan');
     }
+    public function destroy($id)
+    {
+        $projek = Projek::findOrFail($id);
+        $projek->delete();
+
+        return redirect()->back()->with('success', 'Projek berhasil dihapus');
+    }
 }

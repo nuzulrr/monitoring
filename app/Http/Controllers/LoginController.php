@@ -41,16 +41,27 @@ public function showRegisterForm()
 }
     public function register(Request $request)
     {
+        // Gabungkan validasi standar dan validasi Secret Code dari .env
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'secret_code' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    // Mencocokkan input dengan REGISTRATION_SECRET di file .env
+                    if ($value !== env('REGISTRATION_SECRET')) {
+                        $fail('Kode rahasia salah. Anda tidak memiliki izin untuk mendaftar.');
+                    }
+                },
+            ],
         ]);
 
+        // Jika validasi lolos, buat user baru
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), // Password WAJIB di-hash
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
         return redirect('/login')->with('success', 'Pendaftaran berhasil. Silakan login.');
@@ -65,4 +76,5 @@ public function showRegisterForm()
         
         return redirect('/login');
     }
+    
 }

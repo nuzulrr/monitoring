@@ -127,6 +127,13 @@
     .dot-danger {
       background-color: #b81a1a;
     }
+    .ring-warning {
+      background-color: #f4ecd2;
+    }
+
+    .dot-warning {
+      background-color: #f1c40f;
+    }
 
     /* TAMBAHAN KODE: Style untuk tombol Add Site & Add Project */
     .btn-add-action {
@@ -219,6 +226,11 @@
     50% { opacity: 0; }
 }
 
+
+.status-checking { background-color: #6c757d; } /* Abu-abu */
+    .status-online { background-color: #198754; box-shadow: 0 0 10px rgba(25, 135, 84, 0.5); } /* Hijau */
+    .status-timeout { background-color: #ffc107; } /* Kuning */
+    .status-unreachable { background-color: #dc3545; } /* Merah */
 /* ===== TETAP PUNYA KAMU (TIDAK DIHAPUS) ===== */
 
 .status-pill {
