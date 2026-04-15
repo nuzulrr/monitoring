@@ -92,7 +92,7 @@
             <div class="card-header border-0 pb-0">
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-2">
                     <div class="d-flex flex-wrap gap-2 mb-3">
-                        <button type="button" class="top-nav-btn active" data-kategori="all">All</button>
+                        <button type="button" class="top-nav-btn active" data-kategori="all">All Project</button>
                         <button type="button" class="top-nav-btn" data-kategori="1">Coklat</button>
                         <button type="button" class="top-nav-btn" data-kategori="2">Hijau</button>
                         <button type="button" class="top-nav-btn" data-kategori="3">Loreng</button>
@@ -118,10 +118,10 @@
                                         <div class="modal-body">
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Kategori Projek Utama</label>
+                                                    <label class="form-label">Main Project Categories</label>
                                                     <select name="id_projek" id="select-id-projek" class="form-select"
                                                         required>
-                                                        <option value="">-- Pilih Projek --</option>
+                                                        <option value="">-- Choose Project --</option>
                                                         @foreach($projek as $p)
                                                         <option value="{{ $p->id_projek }}">{{ $p->nama_projek }}
                                                         </option>
@@ -129,9 +129,9 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Kategori Instansi</label>
+                                                    <label class="form-label">Pilar</label>
                                                     <select name="kategori" class="form-select" required>
-                                                        <option value="">-- Pilih Kategori --</option>
+                                                        <option value="">-- Choose Pilar --</option>
                                                         <option value="1">Coklat</option>
                                                         <option value="2">Hijau </option>
                                                         <option value="3">Loreng </option>
@@ -140,7 +140,7 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label">Nama Site / Detail Projek</label>
+                                                <label class="form-label">Site Name / Project Detail</label>
                                                 <input type="text" name="projek" id="input-projek-manual"
                                                     class="form-control" placeholder="" required>
                                             </div>
@@ -152,21 +152,21 @@
                                                         placeholder="" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Tanggal Instalasi</label>
+                                                    <label class="form-label">Date Installation</label>
                                                     <input type="date" name="tgl_instalasi" class="form-control"
                                                         required>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Catatan</label>
+                                                <label class="form-label">Note</label>
                                                 <textarea name="note" class="form-control" rows="3"
-                                                    placeholder="Tambahkan catatan tambahan di sini..."></textarea>
+                                                    placeholder="Add Note..."></textarea>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label">Alamat Lengkap</label>
+                                                <label class="form-label">Address</label>
                                                 <input type="text" name="alamat" id="input-alamat" class="form-control"
-                                                    placeholder="Pilih lokasi di peta..." required>
+                                                    placeholder="Select location on the map..." required>
                                             </div>
 
                                             <div class="mb-2">
@@ -193,10 +193,10 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" id="btnSimpan" onclick="confirmSimpanLokasi()"
+                                            <button type="button" id="btnSave" onclick="confirmSaveLokasi()"
                                                 class="btn btn-primary">
-                                                <span id="textSimpan">Add Site</span>
-                                                <span id="loadingSimpan" class="spinner-border spinner-border-sm d-none"
+                                                <span id="textSave">Add Site</span>
+                                                <span id="loadingSave" class="spinner-border spinner-border-sm d-none"
                                                     role="status" aria-hidden="true"></span>
                                             </button>
                                         </div>
@@ -245,12 +245,12 @@
                                             }
                                         });
 
-                                        // --- 3. FUNGSI SIMPAN DENGAN LOADING & SWAL ---
-                                        function confirmSimpanLokasi() {
+                                        // --- 3. FUNGSI Save DENGAN LOADING & SWAL ---
+                                        function confirmSaveLokasi() {
                                             const form = document.getElementById('formLokasi');
-                                            const btn = document.getElementById('btnSimpan');
-                                            const text = document.getElementById('textSimpan');
-                                            const loading = document.getElementById('loadingSimpan');
+                                            const btn = document.getElementById('btnSave');
+                                            const text = document.getElementById('textSave');
+                                            const loading = document.getElementById('loadingSave');
 
                                             if (!form.checkValidity()) {
                                                 form.reportValidity();
@@ -258,11 +258,11 @@
                                             }
 
                                             Swal.fire({
-                                                title: 'Simpan Data Site?',
+                                                title: 'Save Data Site?',
                                                 icon: 'question',
                                                 showCancelButton: true,
-                                                confirmButtonText: 'Ya, Simpan',
-                                                cancelButtonText: 'Batal'
+                                                confirmButtonText: 'Ya, Save',
+                                                cancelButtonText: 'Cancel'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
                                                     // Jalankan Efek Loading
@@ -293,7 +293,7 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <h5 class="modal-title">Tambah Projek</h5>
+                            <h5 class="modal-title">Add Project</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
 
@@ -304,16 +304,16 @@
                             <div class="modal-body">
 
                                 <div class="mb-3">
-                                    <label>Nama Projek</label>
+                                    <label>Project Name</label>
                                     <input type="text" name="nama_projek" class="form-control" required>
                                 </div>
 
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="button" onclick="confirmSimpan()" class="btn btn-primary">
-                                    Simpan
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" onclick="confirmSave()" class="btn btn-primary">
+                                    Save
                                 </button>
                             </div>
 
@@ -323,7 +323,7 @@
                 </div>
             </div>
             <script>
-                function confirmSimpan() {
+                function confirmSave() {
 
                     let nama = document.querySelector('[name="nama_projek"]').value;
 
@@ -413,7 +413,7 @@
                                         </span>
                                         <input type="text" id="tableSearch"
                                             class="form-control bg-dark border-secondary text-white"
-                                            placeholder="Cari Nama Site atau IP...">
+                                            placeholder="Find Sites or IPs...">
                                     </div>
                                 </div>
                             </div>
@@ -727,8 +727,8 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Batal</button>
-                                    <button type="submit" id="btn-save-edit" class="btn btn-primary">Simpan
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" id="btn-save-edit" class="btn btn-primary">Save
                                         Perubahan</button>
                                 </div>
                             </form>
@@ -793,11 +793,11 @@
 
     Swal.fire({
         title: 'Konfirmasi Perubahan',
-        text: "Simpan data ini?",
+        text: "Save data ini?",
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Ya, Simpan!',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya, Save!',
+        cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
@@ -818,7 +818,7 @@
             .then(async response => {
                 const data = await response.json();
                 if (response.ok) {
-                    Swal.fire('Berhasil!', 'Data telah disimpan.', 'success')
+                    Swal.fire('Berhasil!', 'Data telah diSave.', 'success')
                         .then(() => { location.reload(); });
                 } else {
                     // Jika validasi gagal (Error 422)
@@ -836,7 +836,7 @@
                     .then(() => { modalInstance.show(); });
             });
         } else {
-            modalInstance.show(); // Jika batal, balik ke modal
+            modalInstance.show(); // Jika Cancel, balik ke modal
         }
     });
 });
@@ -958,7 +958,7 @@
 
             });
 
-        function confirmSimpanLokasi() {
+        function confirmSaveLokasi() {
 
             let projek = document.querySelector('[name="id_projek"]').value;
             let alamat = document.querySelector('[name="alamat"]').value;
@@ -1054,7 +1054,7 @@
                     icon: customIcon
                 }).addTo(mapHome);
 
-                // 🔥 SIMPAN GLOBAL
+                // 🔥 Save GLOBAL
                 markerInstances[item.id_site] = marker;
 
                 const namaProjek = (item.projek_ref && item.projek_ref.nama_projek) ?
@@ -1202,7 +1202,7 @@
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
                     confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Cancel',
                     showLoaderOnConfirm: true,
                     preConfirm: () => {
                         return fetch(`${window.location.origin}/site/${idSite}`, {

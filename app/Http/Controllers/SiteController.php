@@ -9,23 +9,24 @@ use Illuminate\Support\Facades\DB;
 
 class SiteController extends Controller
 {
-public function index()
-{
-    $projek = Projek::all(); 
+    public function index()
+    {
+        $projek = Projek::all();
 
-    $site = Site::with('projek_ref')
-                ->orderBy('id_site', 'desc')
-                ->get();
+        $site = Site::with('projek_ref')
+            ->orderBy('id_site', 'desc')
+            ->get();
 
-    // ✅ TAMBAH INI
-    $kategori = Site::select('kategori')->distinct()->pluck('kategori');
+        // ✅ TAMBAH INI
+        $kategori = Site::select('kategori')->distinct()->pluck('kategori');
 
-    return view('layouts.app', [
-        'projek' => $projek,
-        'sites' => $site,
-        'kategori' => $kategori // WAJIB ADA
-    ]);
-}    public function store(Request $request)
+        return view('layouts.app', [
+            'projek' => $projek,
+            'sites' => $site,
+            'kategori' => $kategori // WAJIB ADA
+        ]);
+    }
+    public function store(Request $request)
     {
         $request->validate([
             'id_projek' => 'required|exists:projek,id_projek',
@@ -58,7 +59,7 @@ public function update(Request $request, $id_site)
     $request->validate([
         'id_projek'     => 'required|exists:projek,id_projek',
         'projek'        => 'required|string|max:255',
-        'ip_address'    => 'required|ip|unique:sites,ip_address,' . $id_site . ',id_site',
+        'ip_address'    => 'required|ip|unique:site,ip_address,' . $id_site . ',id_site',
         'kategori'      => 'required|in:1,2,3',
         'alamat'        => 'required|string',
         'latitude'      => 'required|numeric',
@@ -70,12 +71,17 @@ public function update(Request $request, $id_site)
         'ip_address.unique' => 'IP ini sudah digunakan oleh site lain.',
     ]);
 
-    $site = \App\Models\Site::where('id_site', $id_site)->firstOrFail();
+    // Proses update data
+    $site = Site::where('id_site', $id_site)->firstOrFail();
     $site->update($request->all());
 
-    return redirect()->back()->with('success', 'Data site berhasil diperbarui!');
-}
-    public function destroy($id)
+    // Berikan respon JSON agar Fetch di JavaScript tidak masuk ke bagian .catch(error)
+    if ($request->ajax()) {
+        return response()->json(['message' => 'Data berhasil diperbarui']);
+    }
+
+    return redirect()->back()->with('success', 'Data berhasil diperbarui');
+}    public function destroy($id)
     {
         try {
             // Kita paksa cari berdasarkan kolom id_site
