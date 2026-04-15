@@ -100,7 +100,7 @@
                     <div class="ms-2 ps-3 d-flex">
                         <button type="button" class="btn btn-success btn-add-action me-2" data-bs-toggle="modal"
                             data-bs-target="#modalLokasi">
-                            Tambah Site
+                            Add Site
                         </button>
 
                         <!-- MODAL TAMBAH SITE -->
@@ -109,7 +109,7 @@
                                 <div class="modal-content">
 
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Tambah Lokasi</h5>
+                                        <h5 class="modal-title">Add Location</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
 
@@ -134,7 +134,7 @@
                                                         <option value="">-- Pilih Kategori --</option>
                                                         <option value="1">Coklat</option>
                                                         <option value="2">Hijau </option>
-                                                        <option value="3">Oren </option>
+                                                        <option value="3">Loreng </option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -147,7 +147,7 @@
 
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">IP Address</label>
+                                                    <label class="form-label">IP Public</label>
                                                     <input type="text" name="ip_address" class="form-control"
                                                         placeholder="" required>
                                                 </div>
@@ -195,7 +195,7 @@
                                         <div class="modal-footer">
                                             <button type="button" id="btnSimpan" onclick="confirmSimpanLokasi()"
                                                 class="btn btn-primary">
-                                                <span id="textSimpan">Simpan Site</span>
+                                                <span id="textSimpan">Add Site</span>
                                                 <span id="loadingSimpan" class="spinner-border spinner-border-sm d-none"
                                                     role="status" aria-hidden="true"></span>
                                             </button>
@@ -282,7 +282,7 @@
                         </div>
                         <button type="button" class="btn-add-action" data-bs-toggle="modal"
                             data-bs-target="#modalProjek">
-                            <i class="ph ph-plus me-1"></i> Add Project
+                            <i class=" me-1"></i> Add Project
                         </button>
                     </div>
                 </div>
@@ -459,7 +459,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="ps-4">Project</th>
-                                                <th>IP Address</th>
+                                                <th>IP Public</th>
                                                 <th class="text-center">Instansi</th>
                                                 <th class="text-center">Time</th>
                                                 <th class="text-center">Status</th>
@@ -687,11 +687,11 @@
                                             <select name="kategori" id="edit-kategori" class="form-control">
                                                 <option value="1">Coklat</option>
                                                 <option value="2">Hijau</option>
-                                                <option value="3">Oren</option>
+                                                <option value="3">Loreng</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label>IP Address</label>
+                                            <label>IP Public</label>
                                             <input type="text" name="ip_address" id="edit-ip-address"
                                                 class="form-control">
                                             <div id="ip-feedback" class="small mt-1"></div>
