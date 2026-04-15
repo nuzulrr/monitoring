@@ -726,6 +726,8 @@
                                         style="height:300px; border-radius: 8px; border: 1px solid #ddd;"></div>
                                 </div>
                                 <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Batal</button>
                                     <button type="submit" id="btn-save-edit" class="btn btn-primary">Simpan
                                         Perubahan</button>
                                 </div>
@@ -734,105 +736,160 @@
                     </div>
                 </div>
                 <script>
-    let editMap, editMarker;
-    const modalEditEl = document.getElementById('modalEdit');
-    const inputIp = document.getElementById('edit-ip-address');
-    const ipFeedback = document.getElementById('ip-feedback');
-    const inputAlamat = document.getElementById('edit-alamat'); // Input alamat
-    const btnSave = document.getElementById('btn-save-edit');
+                    let editMap, editMarker;
+                    const modalEditEl = document.getElementById('modalEdit');
+                    const inputIp = document.getElementById('edit-ip-address');
+                    const ipFeedback = document.getElementById('ip-feedback');
+                    const inputAlamat = document.getElementById('edit-alamat');
+                    const btnSave = document.getElementById('btn-save-edit');
+                    const formEdit = document.getElementById('formEdit');
 
-    // 1. Fungsi Ambil Alamat Otomatis (Reverse Geocoding)
-    function fetchAddress(lat, lng) {
-        inputAlamat.value = "Mencari alamat..."; // Loading state
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-            .then(res => res.json())
-            .then(data => {
-                // Mengisi kolom alamat dengan hasil pencarian lokasi
-                inputAlamat.value = data.display_name || "Alamat tidak ditemukan";
-            })
-            .catch(() => { 
-                inputAlamat.value = "Gagal mengambil alamat otomatis"; 
-            });
-    }
+                    // 1. Fungsi Ambil Alamat Otomatis
+                    function fetchAddress(lat, lng) {
+                        inputAlamat.value = "Mencari alamat...";
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                inputAlamat.value = data.display_name || "Alamat tidak ditemukan";
+                            })
+                            .catch(() => {
+                                inputAlamat.value = "Gagal mengambil alamat otomatis";
+                            });
+                    }
 
-    // 2. Event saat tombol Edit diklik (Inisialisasi Modal)
-    document.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const d = this.dataset;
-            document.getElementById('formEdit').action = `/sites/${d.id}`;
-            modalEditEl.dataset.id = d.id;
-            modalEditEl.dataset.lat = d.lat;
-            modalEditEl.dataset.lng = d.lng;
+                    // 2. Event Tombol Edit (Inisialisasi Modal)
+                    document.querySelectorAll('.btn-edit').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const d = this.dataset;
+                            formEdit.action = `/sites/${d.id}`;
+                            modalEditEl.dataset.id = d.id;
+                            modalEditEl.dataset.lat = d.lat;
+                            modalEditEl.dataset.lng = d.lng;
 
-            document.getElementById('edit-id-projek').value = d.projek_id;
-            document.getElementById('edit-projek-manual').value = (d.projek_val === 'null') ? '' : d.projek_val;
-            document.getElementById('edit-kategori').value = d.kategori || '';
-            inputIp.value = (d.ip === 'null') ? '' : d.ip;
-            inputAlamat.value = (d.alamat === 'null') ? '' : d.alamat;
-            document.getElementById('edit-tgl').value = d.tgl;
-            document.getElementById('edit-note').value = (d.note === 'null' || !d.note) ? '' : d.note;
-            document.getElementById('edit-lat').value = d.lat;
-            document.getElementById('edit-lng').value = d.lng;
+                            document.getElementById('edit-id-projek').value = d.projek_id;
+                            document.getElementById('edit-projek-manual').value = (d.projek_val ===
+                                'null') ? '' : d.projek_val;
+                            document.getElementById('edit-kategori').value = d.kategori || '';
+                            inputIp.value = (d.ip === 'null') ? '' : d.ip;
+                            inputAlamat.value = (d.alamat === 'null') ? '' : d.alamat;
+                            document.getElementById('edit-tgl').value = d.tgl;
+                            document.getElementById('edit-note').value = (d.note === 'null' || !d
+                                .note) ? '' : d.note;
+                            document.getElementById('edit-lat').value = d.lat;
+                            document.getElementById('edit-lng').value = d.lng;
 
-            inputIp.classList.remove('is-invalid', 'is-valid');
-            ipFeedback.innerText = "";
-            btnSave.disabled = false;
-        });
-    });
+                            inputIp.classList.remove('is-invalid', 'is-valid');
+                            ipFeedback.innerText = "";
+                            btnSave.disabled = false;
+                        });
+                    });
 
-    // 3. Logika Map, Marker, dan Search Box
-    modalEditEl.addEventListener('shown.bs.modal', function () {
-        const lat = parseFloat(this.dataset.lat) || -6.200;
-        const lng = parseFloat(this.dataset.lng) || 106.816;
+                    formEdit.addEventListener('submit', function (e) {
+    e.preventDefault();
 
-        if (!editMap) {
-            editMap = L.map('map-edit').setView([lat, lng], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(editMap);
-            editMarker = L.marker([lat, lng], { draggable: true }).addTo(editMap);
+    // 1. Tutup modal segera
+    const modalInstance = bootstrap.Modal.getInstance(modalEditEl);
+    if (modalInstance) modalInstance.hide();
 
-            // Fungsi Sinkronisasi Koordinat & Alamat
-            const syncLocation = (nLat, nLng) => {
-                document.getElementById('edit-lat').value = nLat.toFixed(8);
-                document.getElementById('edit-lng').value = nLng.toFixed(8);
-                fetchAddress(nLat, nLng); // Panggil fungsi auto-fill alamat
-            };
-
-            // Klik pada peta untuk pindah marker
-            editMap.on('click', (e) => {
-                editMarker.setLatLng(e.latlng);
-                syncLocation(e.latlng.lat, e.latlng.lng);
-            });
-
-            // Geser marker manual
-            editMarker.on('dragend', () => {
-                const p = editMarker.getLatLng();
-                syncLocation(p.lat, p.lng);
+    Swal.fire({
+        title: 'Konfirmasi Perubahan',
+        text: "Simpan data ini?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Simpan!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Menyimpan...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
             });
 
-            // --- FITUR SEARCH (Pencarian Lokasi) ---
-            const geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-                placeholder: "Cari lokasi atau alamat...",
-                errorMessage: "Lokasi tidak ditemukan."
+            const formData = new FormData(formEdit);
+            fetch(formEdit.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
             })
-            .on('markgeocode', function(e) {
-                const center = e.geocode.center;
-                editMarker.setLatLng(center); // Pindah marker ke hasil pencarian
-                editMap.setView(center, 15); // Zoom ke lokasi
-                syncLocation(center.lat, center.lng); // Update input & alamat
+            .then(async response => {
+                const data = await response.json();
+                if (response.ok) {
+                    Swal.fire('Berhasil!', 'Data telah disimpan.', 'success')
+                        .then(() => { location.reload(); });
+                } else {
+                    // Jika validasi gagal (Error 422)
+                    let errorMsg = data.message || 'Terjadi kesalahan.';
+                    if (data.errors) errorMsg = Object.values(data.errors).flat().join("<br>");
+                    
+                    Swal.fire('Gagal!', errorMsg, 'error').then(() => {
+                        modalInstance.show(); // Buka modal lagi untuk perbaikan
+                    });
+                }
             })
-            .addTo(editMap);
-
+            .catch(error => {
+                // Ini yang menangkap "Gagal terhubung ke server" jika masih ada error 500
+                Swal.fire('Error!', 'Pastikan nama tabel di Controller sudah benar (site).', 'error')
+                    .then(() => { modalInstance.show(); });
+            });
         } else {
-            // Jika map sudah ada, tinggal update posisi sesuai data site yang diklik
-            editMap.setView([lat, lng], 15);
-            editMarker.setLatLng([lat, lng]);
+            modalInstance.show(); // Jika batal, balik ke modal
         }
-        
-        // Memperbaiki rendering peta yang kadang abu-abu saat modal muncul
-        setTimeout(() => { editMap.invalidateSize(); }, 200);
     });
-</script>
+});
+                    modalEditEl.addEventListener('shown.bs.modal', function () {
+                        const lat = parseFloat(this.dataset.lat) || -6.200;
+                        const lng = parseFloat(this.dataset.lng) || 106.816;
+
+                        if (!editMap) {
+                            editMap = L.map('map-edit').setView([lat, lng], 15);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(editMap);
+                            editMarker = L.marker([lat, lng], {
+                                draggable: true
+                            }).addTo(editMap);
+
+                            const syncLocation = (nLat, nLng) => {
+                                document.getElementById('edit-lat').value = nLat.toFixed(8);
+                                document.getElementById('edit-lng').value = nLng.toFixed(8);
+                                fetchAddress(nLat, nLng);
+                            };
+
+                            editMap.on('click', (e) => {
+                                editMarker.setLatLng(e.latlng);
+                                syncLocation(e.latlng.lat, e.latlng.lng);
+                            });
+
+                            editMarker.on('dragend', () => {
+                                const p = editMarker.getLatLng();
+                                syncLocation(p.lat, p.lng);
+                            });
+
+                            const geocoder = L.Control.geocoder({
+                                    defaultMarkGeocode: false,
+                                    placeholder: "Cari lokasi atau alamat...",
+                                    errorMessage: "Lokasi tidak ditemukan."
+                                })
+                                .on('markgeocode', function (e) {
+                                    const center = e.geocode.center;
+                                    editMarker.setLatLng(center);
+                                    editMap.setView(center, 15);
+                                    syncLocation(center.lat, center.lng);
+                                })
+                                .addTo(editMap);
+
+                        } else {
+                            editMap.setView([lat, lng], 15);
+                            editMarker.setLatLng([lat, lng]);
+                        }
+                        setTimeout(() => {
+                            editMap.invalidateSize();
+                        }, 200);
+                    });
+
+                </script>
 
             </div>
         </div>
