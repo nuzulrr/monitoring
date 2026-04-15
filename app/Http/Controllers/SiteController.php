@@ -33,8 +33,7 @@ public function store(Request $request)
             'kategori' => 'required|in:1,2,3',
             'projek' => 'required|string|max:255',
 
-            // Aturan 'ip' dihapus agar bisa menerima Hostname/Domain
-            // Tetap 'unique' agar tidak ada duplikasi alamat perangkat
+            
             'ip_address' => 'required|string|max:255|unique:site,ip_address',
 
             'tgl_instalasi' => 'required|date',
@@ -54,43 +53,28 @@ public function store(Request $request)
             return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
         }
     }
-    public function update(Request $request, $id_site)
-    {
-        // Validasi input sesuai schema di gambar
-        $request->validate([
-            'id_projek' => 'required|exists:projek,id_projek',
-            'projek' => 'required|string|max:255',
-            'ip_address' => 'required|ip',
-            'kategori' => 'required|in:1,2,3',
-            'alamat' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'tgl_instalasi' => 'required|date',
-            'note' => 'nullable|string',
-        ]);
+public function update(Request $request, $id_site)
+{
+    $request->validate([
+        'id_projek'     => 'required|exists:projek,id_projek',
+        'projek'        => 'required|string|max:255',
+        'ip_address'    => 'required|ip|unique:sites,ip_address,' . $id_site . ',id_site',
+        'kategori'      => 'required|in:1,2,3',
+        'alamat'        => 'required|string',
+        'latitude'      => 'required|numeric',
+        'longitude'     => 'required|numeric',
+        'tgl_instalasi' => 'required|date',
+        'note'          => 'nullable|string',
+    ], [
+        // Pesan kustom sesuai permintaan Anda
+        'ip_address.unique' => 'IP ini sudah digunakan oleh site lain.',
+    ]);
 
-        try {
-            // Mencari data berdasarkan primary key id_site
-            $site = Site::where('id_site', $id_site)->firstOrFail();
+    $site = \App\Models\Site::where('id_site', $id_site)->firstOrFail();
+    $site->update($request->all());
 
-            // Update data
-            $site->update([
-                'id_projek' => $request->id_projek,
-                'projek' => $request->projek,
-                'ip_address' => $request->ip_address,
-                'kategori' => $request->kategori,
-                'alamat' => $request->alamat,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'tgl_instalasi' => $request->tgl_instalasi,
-                'note' => $request->note,
-            ]);
-
-            return redirect()->back()->with('success', 'Data site berhasil diperbarui!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
-        }
-    }
+    return redirect()->back()->with('success', 'Data site berhasil diperbarui!');
+}
     public function destroy($id)
     {
         try {

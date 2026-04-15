@@ -42,4 +42,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/sites/{id_site}', [SiteController::class, 'show'])->name('sites.show');
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    
 });
