@@ -47,7 +47,7 @@ public function store(Request $request)
         ]);
 
         try {
-            \App\Models\Site::create($request->all());
+            Site::create($request->all());
             return redirect()->back()->with('success', 'Site berhasil disimpan!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
@@ -58,7 +58,7 @@ public function update(Request $request, $id_site)
     $request->validate([
         'id_projek'     => 'required|exists:projek,id_projek',
         'projek'        => 'required|string|max:255',
-        'ip_address'    => 'required|ip|unique:sites,ip_address,' . $id_site . ',id_site',
+        'ip_address'    => 'required|ip|unique:site,ip_address,' . $id_site . ',id_site',
         'kategori'      => 'required|in:1,2,3',
         'alamat'        => 'required|string',
         'latitude'      => 'required|numeric',
@@ -70,10 +70,16 @@ public function update(Request $request, $id_site)
         'ip_address.unique' => 'IP ini sudah digunakan oleh site lain.',
     ]);
 
-    $site = \App\Models\Site::where('id_site', $id_site)->firstOrFail();
+    // Proses update data
+    $site = Site::where('id_site', $id_site)->firstOrFail();
     $site->update($request->all());
 
-    return redirect()->back()->with('success', 'Data site berhasil diperbarui!');
+    // Berikan respon JSON agar Fetch di JavaScript tidak masuk ke bagian .catch(error)
+    if ($request->ajax()) {
+        return response()->json(['message' => 'Data berhasil diperbarui']);
+    }
+
+    return redirect()->back()->with('success', 'Data berhasil diperbarui');
 }
     public function destroy($id)
     {
