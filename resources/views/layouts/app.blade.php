@@ -13,14 +13,14 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-    <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="{{ asset('assets/images/application/mtt.png') }}" type="image/x-icon" />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/fonts/phosphor/regular/style.css" />
-    <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
-    <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
-    <link rel="stylesheet" href="../assets/css/style-preset.css" />
-    <link rel="stylesheet" href="../assets/css/app.css" />
+    <link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/regular/style.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
+    <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
     <!--js-->
     <!-- LEAFLET -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -378,7 +378,7 @@
                         <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
                             <h5 class="text-white mb-0 d-flex align-items-center">
                                 <span class="text-danger me-2" style="font-size: 18px; letter-spacing: -2px;">|||</span>
-                                MTT Live Monitor Project Map
+                                MTT Monitoring Project
                             </h5>
                             <!-- PINDAH NAV PROJECT KE SINI -->
                             <div class="d-flex bg-dark"
@@ -419,7 +419,7 @@
                                 <div class="ms-auto" style="min-width: 250px;">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text bg-dark border-secondary text-muted">
-                                            <i class="ph ph-magnifying-glass"></i>
+                                            <i class="ph ph-magnifying-glass text-primary"></i>
                                         </span>
                                         <input type="text" id="tableSearch"
                                             class="form-control bg-dark border-secondary text-white"
@@ -1460,57 +1460,70 @@
             });
 
             function startPing(siteId, ipAddress) {
-                if (activeIntervals[siteId]) clearInterval(activeIntervals[siteId]);
+    // Bersihkan interval lama jika ada agar tidak double
+    if (activeIntervals[siteId]) clearInterval(activeIntervals[siteId]);
 
-                const performCheck = () => {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 2000);
-                    // Panggil API Laravel Anda dengan parameter query 'ip'
-                    fetch(`/api/check-status?ip=${ipAddress}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const marker = markerInstances[siteId];
-                            if (!marker) return;
+    const performCheck = () => {
+        const controller = new AbortController();
+        // Timeout 5 detik untuk fetch (lebih lama dari timeout ping di PHP)
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-                            let statusClass = 'status-unreachable'; // Default Merah
-                            let statusText = 'Offline';
-                            let textColor = '#dc3545';
+        fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
+            .then(response => response.json())
+            .then(data => {
+                clearTimeout(timeoutId);
+                const marker = markerInstances[siteId];
+                if (!marker) return;
 
-                            // Logika penentuan status berdasarkan response API Anda
-                            if (data.status === 'online') {
-                                statusClass = 'status-online'; // Hijau
-                                statusText = `Online`;
-                                textColor = '#198754';
-                            } else if (data.status === 'offline') {
-                                statusClass = 'status-timeout'; // Kuning (Timeout)
-                                statusText = 'Timeout';
-                                textColor = '#ffc107';
-                            }
+                let statusClass = 'status-unreachable'; // Merah
+                let statusText = 'Offline';
+                let textColor = '#dc3545';
 
-                            // 1. Update Icon Marker di Peta
-                            const newIcon = L.divIcon({
-                                className: `status-icon ${statusClass}`,
-                                html: ''
-                            });
-                            marker.setIcon(newIcon);
+                // Logika berdasarkan Final Controller
+                if (data.status === 'online') {
+                    statusClass = 'status-online'; // Hijau
+                    // Kita tambahkan info ms agar dashboard lebih informatif
+                    statusText = `Online (${data.response_time}ms)`;
+                    textColor = '#198754';
+                } else if (data.status === 'offline') {
+                    statusClass = 'status-timeout'; // Kuning
+                    statusText = 'Timeout';
+                    textColor = '#ffc107';
+                } else if (data.status === 'unreachable') {
+                    statusClass = 'status-unreachable'; // Merah Tua/Gelap
+                    statusText = 'Unreachable';
+                    textColor = '#721c24';
+                }
 
-                            // 2. Update Text Status di dalam Popup
-                            // Kita gunakan polling untuk cek apakah elemen status-text sudah ada di DOM
-                            const statusElement = document.getElementById(`status-text-${siteId}`);
-                            if (statusElement) {
-                                statusElement.innerText = statusText;
-                                statusElement.style.color = textColor;
-                            }
-                        })
-                        .catch(err => {
-                            console.error("Error checking status:", err);
-                        });
-                };
+                // 1. Update Icon Marker
+                const newIcon = L.divIcon({
+                    className: `status-icon ${statusClass}`,
+                    html: ''
+                });
+                marker.setIcon(newIcon);
 
-                // Jalankan pertama kali, lalu ulangi setiap 30 detik
-                performCheck();
-                activeIntervals[siteId] = setInterval(performCheck, 30000);
-            }
+                // 2. Update Text Status di Popup
+                const statusElement = document.getElementById(`status-text-${siteId}`);
+                if (statusElement) {
+                    statusElement.innerText = statusText;
+                    statusElement.style.color = textColor;
+                }
+            })
+            .catch(err => {
+                if (err.name === 'AbortError') {
+                    console.warn(`Ping ke ${ipAddress} dihentikan karena timeout browser.`);
+                } else {
+                    console.error("Error checking status:", err);
+                }
+            });
+    };
+
+    // Jalankan pertama kali
+    performCheck();
+    
+    // Ulangi setiap 30 detik
+    activeIntervals[siteId] = setInterval(performCheck, 30000);
+}
 
 
             // =========================
@@ -1883,12 +1896,10 @@
         });
 
     </script>
-    <script src="../assets/js/plugins/popper.min.js"></script>
-    <script src="../assets/js/plugins/simplebar.min.js"></script>
-    <script src="../assets/js/plugins/bootstrap.min.js"></script>
-    <script src="../assets/js/fonts/custom-font.js"></script>
-    <script src="../assets/js/pcoded.js"></script>
-    <script src="../assets/js/plugins/feather.min.js"></script>
+    <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
 </body>
 
 </html>
