@@ -23,4 +23,25 @@ class ProjekController extends Controller
 
         return redirect()->back()->with('success', 'Projek berhasil dihapus');
     }
+        
+    
+public function update(Request $request, $id)
+{
+    // 1. Validasi
+    $request->validate([
+        'nama_projek' => 'required|string|max:255',
+    ]);
+
+    // 2. Proses Update
+    $projek = Projek::findOrFail($id);
+    $projek->nama_projek = $request->nama_projek;
+    $projek->save();
+
+    // 3. JANGAN PAKAI redirect()! 
+    // Kirim respon JSON agar Fetch API masuk ke blok .then() bukan .catch()
+    return response()->json([
+        'success' => true,
+        'message' => 'Data berhasil diupdate'
+    ]);
+}
 }

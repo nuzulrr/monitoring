@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/site/{id}', [SiteController::class, 'destroy'])->name('site.destroy');
     Route::get('/sites/{id_site}', [SiteController::class, 'show'])->name('sites.show');
     Route::delete('/projek/{id}', [ProjekController::class, 'destroy'])->name('projek.destroy');
+    Route::put('/projek/{id}', [ProjekController::class, 'update'])->name('projek.update');
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     

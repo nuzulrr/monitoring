@@ -73,7 +73,7 @@
                         <li>
                             <a class="dropdown-item text-danger" href="#"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                <i class="ph ph-arrow-right me-2"></i> Logout
                             </a>
                         </li>
                     </ul>
@@ -682,7 +682,7 @@
                         </div>
 
                         <div class="card border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 12px;">
-                            <div class="card-body p-3">
+                            <div class="card-body p-3 ">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="text-dark fw-bold m-0 d-flex align-items-center"
                                         style="font-size: 14px;">
@@ -695,7 +695,7 @@
                                     </span>
                                 </div>
 
-                                <div class="d-flex flex-column gap-2">
+                                <div class="d-flex flex-column ">
                                     @foreach($projek as $p)
                                     <div class="card border-0 shadow-sm"
                                         style="border-radius: 8px; background-color: #ffffff; overflow: visible;">
@@ -711,13 +711,268 @@
                                                 </span>
                                             </div>
 
-                                            <div class="ms-2">
+                                            <div class="ms-2 d-flex gap-1">
                                                 <button type="button"
-                                                    onclick="deleteProject('{{ $p->id_projek }}', '{{ $p->nama_projek }}')"
-                                                    class="btn btn-link text-danger p-1 border-0 shadow-none d-flex align-items-center justify-content-center"
+                                                    onclick="openEditModal('{{ $p->id_projek }}', '{{ $p->nama_projek }}')"
+                                                    class="btn btn-link p-1 border-0 shadow-none d-flex align-items-center justify-content-center"
                                                     style="width: 30px; height: 30px; position: relative; z-index: 10;">
-                                                    <i class="bi bi-trash3-fill" style="font-size: 1.1rem;"></i>
+                                                    <i class=" ph ph-pencil f-18 text-primary"
+                                                        style="font-size: 1.1rem; color: #ffc107;"></i>
                                                 </button>
+                                                <div class="modal fade" id="modalEditProjek" tabindex="-1"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content border-0 shadow"
+                                                            style="border-radius: 12px;">
+                                                            <div class="modal-header border-0 pb-0">
+                                                                <h6 class="modal-title fw-bold">
+                                                                    <i
+                                                                        class="ph ph-box-arrow-right me-2 text-warning"></i>Edit
+                                                                    Nama Projek
+                                                                </h6>
+                                                                <button type="button" class="btn-close shadow-none"
+                                                                    data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <input type="hidden" id="edit_id_projek">
+                                                                <div class="form-group">
+                                                                    <label class="small fw-bold text-muted mb-2">NAMA
+                                                                        PROJEK BARU</label>
+                                                                    <input type="text" id="edit_nama_projek"
+                                                                        class="form-control border-0 bg-light shadow-none"
+                                                                        style="border-radius: 8px;" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer border-0 pt-0">
+                                                                <button type="button"
+                                                                    class="btn btn-light btn-sm fw-bold px-3"
+                                                                    data-bs-dismiss="modal">Batal</button>
+                                                                <button type="button" onclick="confirmSaveProjek()"
+                                                                    class="btn btn-warning btn-sm fw-bold px-3 text-white">Simpan
+                                                                    Perubahan</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <script>
+                                                    // Membuka Modal dan Mengisi Data
+                                                    function openEditModal(id, name) {
+                                                        document.getElementById('edit_id_projek').value = id;
+                                                        document.getElementById('edit_nama_projek').value = name;
+
+                                                        const modal = new bootstrap.Modal(document.getElementById(
+                                                            'modalEditProjek'));
+                                                        modal.show();
+                                                    }
+
+                                                    // Konfirmasi Sebelum Simpan
+                                                    function confirmSaveProjek() {
+                                                        const id = document.getElementById('edit_id_projek').value;
+                                                        const newName = document.getElementById('edit_nama_projek')
+                                                            .value;
+
+                                                        if (!newName.trim()) {
+                                                            Swal.fire('Error', 'Nama projek tidak boleh kosong!',
+                                                                'error');
+                                                            return;
+                                                        }
+
+                                                        Swal.fire({
+                                                            title: 'Simpan Perubahan?',
+                                                            text: `Nama projek akan diubah menjadi "${newName}"`,
+                                                            icon: 'question',
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: '#ffc107',
+                                                            confirmButtonText: 'Ya, Simpan!',
+                                                            cancelButtonText: 'Batal'
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                executeSaveProjek(id, newName);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    // Eksekusi Update via AJAX
+                                                    function executeSaveProjek(id, name) {
+                                                        Swal.fire({
+                                                            title: 'Sedang menyimpan...',
+                                                            allowOutsideClick: false,
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            }
+                                                        });
+
+                                                        fetch(`/projek/${id}`, {
+                                                                method: 'PUT',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    nama_projek: name
+                                                                })
+                                                            })
+                                                            .then(response => response.json())
+                                                            .then(data => {
+                                                                Swal.close();
+
+                                                                // 🔥 CARA TERBAIK MENUTUP MODAL BOOTSTRAP 5
+                                                                const modalElement = document.getElementById(
+                                                                    'modalEditProjek');
+                                                                const modalInstance = bootstrap.Modal.getInstance(
+                                                                    modalElement) || new bootstrap.Modal(
+                                                                    modalElement);
+
+                                                                modalInstance
+                                                                    .hide(); // Tutup modal secara programatik
+
+                                                                // Tambahan: Hapus backdrop manual jika modal macet (opsional)
+                                                                document.querySelectorAll('.modal-backdrop')
+                                                                    .forEach(el => el.remove());
+                                                                document.body.classList.remove('modal-open');
+                                                                document.body.style.paddingRight = '';
+
+                                                                Swal.fire({
+                                                                    icon: 'success',
+                                                                    title: 'Berhasil!',
+                                                                    text: 'Nama projek telah diperbarui.',
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false
+                                                                }).then(() => {
+                                                                    location.reload();
+                                                                });
+                                                            })
+                                                            .catch((error) => {
+                                                                console.error('Error:', error);
+                                                                Swal.fire('Error', 'Gagal menghubungi server.',
+                                                                    'error');
+                                                            });
+                                                    } // 1. Membuka Modal
+                                                    function openEditModal(id, name) {
+                                                        document.getElementById('edit_id_projek').value = id;
+                                                        document.getElementById('edit_nama_projek').value = name;
+
+                                                        const modalEl = document.getElementById('modalEditProjek');
+                                                        const modalInstance = bootstrap.Modal.getOrCreateInstance(
+                                                            modalEl);
+                                                        modalInstance.show();
+                                                    }
+
+                                                    // 2. Konfirmasi Simpan
+                                                    function confirmSaveProjek() {
+                                                        const name = document.getElementById('edit_nama_projek').value;
+
+                                                        if (!name.trim()) {
+                                                            Swal.fire('Error', 'Nama projek tidak boleh kosong!',
+                                                                'error');
+                                                            return;
+                                                        }
+
+                                                        // 🔥 TUTUP MODAL DULU AGAR TIDAK BENTROK Z-INDEX
+                                                        const modalEl = document.getElementById('modalEditProjek');
+                                                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                                                        if (modalInstance) modalInstance.hide();
+
+                                                        // Baru munculkan konfirmasi
+                                                        Swal.fire({
+                                                            title: 'Simpan Perubahan?',
+                                                            text: "Data akan diperbarui di sistem.",
+                                                            icon: 'question',
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: '#ffc107',
+                                                            cancelButtonColor: '#6c757d',
+                                                            confirmButtonText: 'Ya, Simpan!',
+                                                            cancelButtonText: 'Batal'
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                const id = document.getElementById(
+                                                                    'edit_id_projek').value;
+                                                                executeSaveProjek(id, name);
+                                                            } else {
+                                                                // Jika batal, buka kembali modalnya
+                                                                if (modalInstance) modalInstance.show();
+                                                            }
+                                                        });
+                                                    }
+
+
+                                                    async function executeSaveProjek(id, name) {
+                                                        Swal.fire({
+                                                            title: 'Sedang menyimpan...',
+                                                            allowOutsideClick: false,
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            }
+                                                        });
+
+                                                        try {
+                                                            const response = await fetch(`/projek/${id}`, {
+                                                                method: 'PUT',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    nama_projek: name
+                                                                })
+                                                            });
+
+                                                            // Cek jika respon server tidak oke (misal 500 atau 404)
+                                                            if (!response.ok) throw new Error(
+                                                            'Respon server gagal');
+
+                                                            const data = await response.json();
+
+                                                            //JIKA BERHASIL
+                                                            Swal.close();
+
+                                                            // Tutup Modal dengan Aman
+                                                            const modalElement = document.getElementById(
+                                                                'modalEditProjek');
+                                                            const modalInstance = bootstrap.Modal
+                                                                .getOrCreateInstance(modalElement);
+                                                            modalInstance.hide();
+
+                                                            // Bersihkan sisa backdrop
+                                                            document.querySelectorAll('.modal-backdrop').forEach(
+                                                                el => el.remove());
+                                                            document.body.classList.remove('modal-open');
+
+                                                            await Swal.fire({
+                                                                icon: 'success',
+                                                                title: 'Berhasil!',
+                                                                text: 'Data telah tersimpan.',
+                                                                timer: 1500,
+                                                                showConfirmButton: false
+                                                            });
+
+                                                            location
+                                                        .reload(); // Refresh setelah alert sukses selesai
+
+                                                        } catch (error) {
+                                                            console.error('Error detail:', error);
+
+                                                            // Cek apakah data sebenarnya tersimpan (opsional, tapi aman untuk user)
+                                                            Swal.fire({
+                                                                icon: 'error',
+                                                                title: 'Koneksi Terputus',
+                                                                text: 'Data mungkin sudah tersimpan, silakan refresh halaman untuk memastikan.',
+                                                                confirmButtonText: 'Refresh Sekarang',
+                                                                confirmButtonColor: '#ffc107',
+                                                            }).then(() => {
+                                                                location.reload();
+                                                            });
+                                                        }
+                                                    }
+
+                                                </script>
+                                                <!-- Tombol Delete -->
+
+
+
+                                                <!-- end Delete -->
+
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -1208,8 +1463,8 @@
                 if (activeIntervals[siteId]) clearInterval(activeIntervals[siteId]);
 
                 const performCheck = () => {
-                  const controller = new AbortController();
-                  const timeoutId = setTimeout(() => controller.abort(), 2000);
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2000);
                     // Panggil API Laravel Anda dengan parameter query 'ip'
                     fetch(`/api/check-status?ip=${ipAddress}`)
                         .then(response => response.json())
