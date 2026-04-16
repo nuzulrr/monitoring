@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-    <title>MTT Live Monitor Project Map</title>
+    <title>MTT Monitoring Project</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description"
-        content="Datta able is trending dashboard template made using Bootstrap 5 design framework." />
-    <meta name="keywords" content="Bootstrap admin template, Dashboard UI Kit" />
-    <meta name="author" content="Codedthemes" />
+        content="Web ini digunakan untuk memantau dan mengelola proyek monitoring MTT" />
+    <meta name="keywords" content="monitoring, mtt, proyek" />
+    <meta name="author" content="Nuzul Rizki Ramadhan" />
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
