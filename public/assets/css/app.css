@@ -323,3 +323,29 @@
 #map-home {
     background: radial-gradient(circle at center, #001018, #000814);
 }
+.line-anim span {
+    display: inline-block;
+    font-size: 18px;
+    margin-right: -2px;
+    animation: naikTurun 1s infinite ease-in-out;
+}
+
+/* delay biar bergantian */
+.line-anim span:nth-child(1) {
+    animation-delay: 0s;
+}
+.line-anim span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.line-anim span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes naikTurun {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}

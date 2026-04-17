@@ -377,7 +377,11 @@
                     <div class="card card-dark-custom h-100">
                         <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
                             <h5 class="text-white mb-0 d-flex align-items-center">
-                                <span class="text-danger me-2" style="font-size: 18px; letter-spacing: -2px;">|||</span>
+<span class="line-anim text-danger me-2">
+    <span>|</span>
+    <span>|</span>
+    <span>|</span>
+</span>
                                 MTT Monitoring Project
                             </h5>
                             <!-- PINDAH NAV PROJECT KE SINI -->
@@ -470,13 +474,13 @@
                                             <tr class="text-center">
                                                 <th>Project</th>
                                                 <th>IP Public</th>
-                                                <th>Instansi</th>
+                                                <th>Pilar</th>
                                                 <th>Status</th>
-                                                <th>Alamat</th>
-                                                <th>Tanggal Instalasi</th>
+                                                <th>Address</th>
+                                                <th>Instalation Date</th>
                                                 <th>Note</th>
-                                                <th>Tanggal diupdate</th>
-                                                <th>Aksi</th>
+                                                <th>Updated date</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
 
