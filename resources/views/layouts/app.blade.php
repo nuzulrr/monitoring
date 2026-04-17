@@ -377,20 +377,15 @@
                     <div class="card card-dark-custom h-100">
                         <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
                             <h5 class="text-white mb-0 d-flex align-items-center">
-<span class="line-anim text-danger me-2">
-    <span>|</span>
-    <span>|</span>
-    <span>|</span>
-</span>
+                                <span class="text-danger me-2" style="font-size: 18px; letter-spacing: -2px;">|||</span>
                                 MTT Monitoring Project
                             </h5>
                             <!-- PINDAH NAV PROJECT KE SINI -->
-<div class="d-flex bg-dark"
-    style="border: 1px solid #333; border-radius: 6px; padding: 2px;">
-    <button type="button" id="btn-fullscreen" class="btn btn-sm btn-dark text-white border-0 d-flex align-items-center justify-content-center" title="Toggle Fullscreen" style="width: 30px; height: 30px;">
-        <i class="ph ph-corners-out f-18"></i>
-    </button>
-</div>
+                            <div class="d-flex bg-dark"
+                                style="border: 1px solid #333; border-radius: 6px; padding: 2px;">
+                                <button class="map-btn active"><i class="ph ph-crosshair me-1"></i> Indonesia
+                                    View</button>
+                            </div>
                         </div>
                         <div class="card-body p-3">
                             <div class="map-container position-relative"
@@ -475,13 +470,13 @@
                                             <tr class="text-center">
                                                 <th>Project</th>
                                                 <th>IP Public</th>
-                                                <th>Pilar</th>
+                                                <th>Instansi</th>
                                                 <th>Status</th>
-                                                <th>Address</th>
-                                                <th>Instalation Date</th>
+                                                <th>Alamat</th>
+                                                <th>Tanggal Instalasi</th>
                                                 <th>Note</th>
-                                                <th>Updated date</th>
-                                                <th>Action</th>
+                                                <th>Tanggal diupdate</th>
+                                                <th>Aksi</th>
                                             </tr>
                                         </thead>
 
@@ -1021,7 +1016,7 @@
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header bg-primary text-white">
-                                    <h5 class="modal-title">Edit Site Location</h5>
+                                    <h5 class="modal-title">Edit Lokasi Site</h5>
                                     <button type="button" class="btn-close btn-close-white"
                                         data-bs-dismiss="modal"></button>
                                 </div>
@@ -1031,7 +1026,7 @@
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label>Project</label>
+                                                <label>Projek</label>
                                                 <select name="id_projek" id="edit-id-projek" class="form-control">
                                                     @foreach($projek as $p)
                                                     <option value="{{ $p->id_projek }}">{{ $p->nama_projek }}</option>
@@ -1039,7 +1034,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label>Site Name</label>
+                                                <label>Nama Site</label>
                                                 <input type="text" name="projek" id="edit-projek-manual"
                                                     class="form-control">
                                             </div>
@@ -1047,7 +1042,7 @@
 
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label>Pilar</label>
+                                                <label>Kategori</label>
                                                 <select name="kategori" id="edit-kategori" class="form-control">
                                                     <option value="1">Coklat</option>
                                                     <option value="2">Hijau</option>
@@ -1063,14 +1058,14 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label>Address</label>
+                                            <label>Alamat</label>
                                             <textarea name="alamat" id="edit-alamat" class="form-control"
                                                 rows="2"></textarea>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label>Instalation Date</label>
+                                                <label>Tanggal Instalasi</label>
                                                 <input type="date" name="tgl_instalasi" id="edit-tgl"
                                                     class="form-control">
                                             </div>
@@ -1094,7 +1089,7 @@
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Cancel</button>
                                         <button type="submit" id="btn-save-edit" class="btn btn-primary">Save
-                                            </button>
+                                            Perubahan</button>
                                     </div>
                                 </form>
                             </div>
@@ -1899,55 +1894,7 @@
             });
 
         });
-document.addEventListener("DOMContentLoaded", function () {
-    const mapContainer = document.querySelector('.map-container');
-    const btnFullscreen = document.getElementById('btn-fullscreen');
-    const iconFullscreen = btnFullscreen.querySelector('i');
 
-    // Event listener untuk tombol click
-    btnFullscreen.addEventListener('click', function () {
-        if (!document.fullscreenElement) {
-            // Masuk mode Fullscreen
-            if (mapContainer.requestFullscreen) {
-                mapContainer.requestFullscreen();
-            } else if (mapContainer.webkitRequestFullscreen) { /* Safari */
-                mapContainer.webkitRequestFullscreen();
-            } else if (mapContainer.msRequestFullscreen) { /* IE11 */
-                mapContainer.msRequestFullscreen();
-            }
-        } else {
-            // Keluar dari mode Fullscreen
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { /* IE11 */
-                document.msExitFullscreen();
-            }
-        }
-    });
-
-    // Deteksi perubahan state fullscreen (masuk/keluar)
-    document.addEventListener('fullscreenchange', function () {
-        if (document.fullscreenElement) {
-            // Jika sedang fullscreen, ubah icon jadi "shrink"
-            iconFullscreen.classList.remove('ph-corners-out');
-            iconFullscreen.classList.add('ph-corners-in');
-        } else {
-            // Jika keluar fullscreen, ubah icon kembali jadi "expand"
-            iconFullscreen.classList.remove('ph-corners-in');
-            iconFullscreen.classList.add('ph-corners-out');
-        }
-
-        // WAJIB UNTUK LEAFLET: Render ulang ukuran map setelah delay kecil
-        // agar tile map tidak terpotong (abu-abu)
-        setTimeout(() => {
-            if (typeof mapHome !== 'undefined') {
-                mapHome.invalidateSize();
-            }
-        }, 300);
-    });
-});
     </script>
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
