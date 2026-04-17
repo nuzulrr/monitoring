@@ -1029,7 +1029,7 @@
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label>Projek</label>
+                                                <label>Project</label>
                                                 <select name="id_projek" id="edit-id-projek" class="form-control">
                                                     @foreach($projek as $p)
                                                     <option value="{{ $p->id_projek }}">{{ $p->nama_projek }}</option>
@@ -1037,7 +1037,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label>Nama Site</label>
+                                                <label>Site Name</label>
                                                 <input type="text" name="projek" id="edit-projek-manual"
                                                     class="form-control">
                                             </div>
@@ -1045,7 +1045,7 @@
 
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label>Kategori</label>
+                                                <label>Pilar</label>
                                                 <select name="kategori" id="edit-kategori" class="form-control">
                                                     <option value="1">Coklat</option>
                                                     <option value="2">Hijau</option>
@@ -1061,14 +1061,14 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label>Alamat</label>
+                                            <label>Address</label>
                                             <textarea name="alamat" id="edit-alamat" class="form-control"
                                                 rows="2"></textarea>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label>Tanggal Instalasi</label>
+                                                <label>Instalation Date</label>
                                                 <input type="date" name="tgl_instalasi" id="edit-tgl"
                                                     class="form-control">
                                             </div>
@@ -1092,7 +1092,7 @@
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Cancel</button>
                                         <button type="submit" id="btn-save-edit" class="btn btn-primary">Save
-                                            Perubahan</button>
+                                            </button>
                                     </div>
                                 </form>
                             </div>
