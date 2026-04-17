@@ -385,10 +385,12 @@
                                 MTT Monitoring Project
                             </h5>
                             <!-- PINDAH NAV PROJECT KE SINI -->
-                            <div class="d-flex bg-dark"
-                                style="border: 1px solid #333; border-radius: 6px; padding: 2px;">
-                                
-                            </div>
+<div class="d-flex bg-dark"
+    style="border: 1px solid #333; border-radius: 6px; padding: 2px;">
+    <button type="button" id="btn-fullscreen" class="btn btn-sm btn-dark text-white border-0 d-flex align-items-center justify-content-center" title="Toggle Fullscreen" style="width: 30px; height: 30px;">
+        <i class="ph ph-corners-out f-18"></i>
+    </button>
+</div>
                         </div>
                         <div class="card-body p-3">
                             <div class="map-container position-relative"
@@ -1897,7 +1899,55 @@
             });
 
         });
+document.addEventListener("DOMContentLoaded", function () {
+    const mapContainer = document.querySelector('.map-container');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    const iconFullscreen = btnFullscreen.querySelector('i');
 
+    // Event listener untuk tombol click
+    btnFullscreen.addEventListener('click', function () {
+        if (!document.fullscreenElement) {
+            // Masuk mode Fullscreen
+            if (mapContainer.requestFullscreen) {
+                mapContainer.requestFullscreen();
+            } else if (mapContainer.webkitRequestFullscreen) { /* Safari */
+                mapContainer.webkitRequestFullscreen();
+            } else if (mapContainer.msRequestFullscreen) { /* IE11 */
+                mapContainer.msRequestFullscreen();
+            }
+        } else {
+            // Keluar dari mode Fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+    });
+
+    // Deteksi perubahan state fullscreen (masuk/keluar)
+    document.addEventListener('fullscreenchange', function () {
+        if (document.fullscreenElement) {
+            // Jika sedang fullscreen, ubah icon jadi "shrink"
+            iconFullscreen.classList.remove('ph-corners-out');
+            iconFullscreen.classList.add('ph-corners-in');
+        } else {
+            // Jika keluar fullscreen, ubah icon kembali jadi "expand"
+            iconFullscreen.classList.remove('ph-corners-in');
+            iconFullscreen.classList.add('ph-corners-out');
+        }
+
+        // WAJIB UNTUK LEAFLET: Render ulang ukuran map setelah delay kecil
+        // agar tile map tidak terpotong (abu-abu)
+        setTimeout(() => {
+            if (typeof mapHome !== 'undefined') {
+                mapHome.invalidateSize();
+            }
+        }, 300);
+    });
+});
     </script>
     <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>

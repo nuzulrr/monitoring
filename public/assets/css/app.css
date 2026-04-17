@@ -349,3 +349,10 @@
         transform: translateY(-8px);
     }
 }
+
+    /* Mengatasi background putih saat fullscreen di beberapa browser */
+    .map-container:fullscreen {
+        background-color: #212529 !important; 
+        height: 100vh !important;
+        width: 100vw !important;
+    }
