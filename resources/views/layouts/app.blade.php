@@ -413,17 +413,17 @@
                         <div class="card card-dark-custom mb-4 h-100">
                             <div class="card-header border-0 pb-1 d-flex justify-content-between align-items-center">
                                 <h5 class="text-white mb-0 d-flex align-items-center">
-                                    <i class="ph ph-arrows-left-right text-muted me-2 f-20"></i> Live IP Monitoring
+                                    <i class="ph ph-monitor text-danger me-2 f-20"></i> Live IP Monitoring
                                 </h5>
 
                                 <div class="ms-auto" style="min-width: 250px;">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text bg-dark border-secondary text-muted">
-                                            <i class="ph ph-magnifying-glass text-primary"></i>
+                                            <i class="ph ph-magnifying-glass text-danger"></i>
                                         </span>
                                         <input type="text" id="tableSearch"
                                             class="form-control bg-dark border-secondary text-white"
-                                            placeholder="Find Sites or IPs...">
+                                            placeholder="Find Sites or IP Address..." style="font-size: 12px;">
                                     </div>
                                 </div>
                             </div>
