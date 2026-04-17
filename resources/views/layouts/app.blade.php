@@ -387,8 +387,7 @@
                             <!-- PINDAH NAV PROJECT KE SINI -->
                             <div class="d-flex bg-dark"
                                 style="border: 1px solid #333; border-radius: 6px; padding: 2px;">
-                                <button class="map-btn active"><i class="ph ph-crosshair me-1"></i> Indonesia
-                                    View</button>
+                                
                             </div>
                         </div>
                         <div class="card-body p-3">
