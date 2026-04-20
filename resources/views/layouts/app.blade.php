@@ -496,7 +496,7 @@
                                 <small class="text-muted ms-1" style="font-size: 10px;">ms</small>
                               </div>
 
-                              <div id="dot-{{ $ipId }}" class="status-pill warning" style="width: 12px; height: 12px;">
+                              <div id="dot-{{ $ipId }}" class="status-pill gray" style="width: 12px; height: 12px;">
                               </div>
                             </div>
                           </td>

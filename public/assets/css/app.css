@@ -255,6 +255,10 @@
     background-color: #f1c40f; 
     box-shadow: 0 0 10px #f1c40f; 
 }
+.status-pill.gray { 
+    background-color: #6c757d; 
+    box-shadow: 0 0 10px #6c757d; 
+}
 
 /* TAMBAHAN UNREACHABLE */
 .status-pill.secondary {
