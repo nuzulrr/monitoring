@@ -19,18 +19,6 @@
   <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
   <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
   <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
-  <style>
-    .status-pill.warning {
-      animation: blink 1s infinite;
-    }
-    .status-icon.status-timeout {
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0.3; }
-    }
-  </style>
   <!--js-->
   <!-- LEAFLET -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -358,7 +346,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                        success ') }}',
+                          success ') }}',
             timer: 2000,
             showConfirmButton: false
           });

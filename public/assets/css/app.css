@@ -407,3 +407,23 @@
         height: 100vh !important;
         width: 100vw !important;
     }
+    .status-pill.warning {
+      animation: blink 1s infinite;
+    }
+
+    .status-icon.status-timeout {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      50% {
+        opacity: 1;
+      }
+
+      51%,
+      100% {
+        opacity: 0.3;
+      }
+    }
