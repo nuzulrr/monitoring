@@ -19,6 +19,18 @@
   <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link" />
   <link rel="stylesheet" href="{{ asset('assets/css/style-preset.css') }}" />
   <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" />
+  <style>
+    .status-pill.warning {
+      animation: blink 1s infinite;
+    }
+    .status-icon.status-timeout {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+  </style>
   <!--js-->
   <!-- LEAFLET -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -346,7 +358,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                      success ') }}',
+                        success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -493,7 +505,8 @@
                             <div class="d-flex align-items-center justify-content-center gap-2">
                               <div class="d-flex align-items-baseline">
                                 <strong id="ping-value-{{ $ipId }}" class="text-info fs-6">--</strong>
-                                <small class="text-muted ms-1" style="font-size: 10px;">ms</small>
+                                <small id="ms-label-{{ $ipId }}" class="text-success ms-1"
+                                  style="font-size: 10px; display: none;">ms</small>
                               </div>
 
                               <div id="dot-{{ $ipId }}" class="status-pill gray" style="width: 12px; height: 12px;">
@@ -1366,9 +1379,25 @@
         keyboard: false
       }).setView([-2.5489, 118.0149], 5);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(mapHome);
+      // =========================================
+      // 🔥 LOAD PETA INDONESIA (NO LABEL)
+      // =========================================
+      fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json')
+        .then(res => res.json())
+        .then(data => {
+
+          const geoLayer = L.geoJSON(data, {
+            style: {
+              fillColor: '#7a6b6b',
+              color: '#3a2a2a',
+              weight: 1,
+              fillOpacity: 1
+            }
+          }).addTo(mapHome);
+
+          mapHome.fitBounds(geoLayer.getBounds());
+        })
+        .catch(err => console.error('GeoJSON error:', err));
 
       const sites = @json($sites);
       const markersCoordinates = [];
@@ -1425,7 +1454,7 @@
         }
       });
 
-function startPing(siteId, ipAddress, index) {
+      function startPing(siteId, ipAddress, index) {
         // Bersihkan interval lama jika ada
         if (activeIntervals[siteId]) clearInterval(activeIntervals[siteId]);
 
@@ -1441,42 +1470,48 @@ function startPing(siteId, ipAddress, index) {
               .then(response => response.json())
               .then(data => {
                 clearTimeout(timeoutId);
-                
+
                 const marker = markerInstances[siteId];
                 const statusElement = document.getElementById(`status-text-${siteId}`);
                 const pingDisplay = document.getElementById(`ping-value-${ipId}`);
                 const dot = document.getElementById(`dot-${ipId}`);
 
-                let statusClass = 'status-unreachable'; 
+                let statusClass = 'status-unreachable';
                 let statusText = 'Unreachable';
                 let textColor = '#dc3545';
                 let dotClass = 'status-pill danger';
 
                 if (data.status === 'online') {
-                  statusClass = 'status-online'; 
+                  statusClass = 'status-online';
                   statusText = `Online (${data.response_time}ms)`;
                   textColor = '#198754';
                   dotClass = 'status-pill success';
-                  
+
                   if (pingDisplay) {
-                      pingDisplay.innerText = data.response_time;
-                      pingDisplay.className = 'text-success fw-bold';
+                    pingDisplay.innerText = data.response_time;
+                    pingDisplay.className = 'text-success fw-bold';
                   }
+                  const msLabel = document.getElementById(`ms-label-${ipId}`);
+                  if (msLabel) msLabel.style.display = 'inline';
                 } else if (data.status === 'offline') {
-                  statusClass = 'status-timeout'; 
+                  statusClass = 'status-timeout';
                   statusText = 'Timeout';
                   textColor = '#ffc107';
                   dotClass = 'status-pill warning';
-                  
+
                   if (pingDisplay) {
-                      pingDisplay.innerText = 'Timeout';
-                      pingDisplay.className = 'text-warning';
+                    pingDisplay.innerText = 'Timeout';
+                    pingDisplay.className = 'text-warning';
                   }
+                  const msLabel = document.getElementById(`ms-label-${ipId}`);
+                  if (msLabel) msLabel.style.display = 'none';
                 } else {
                   if (pingDisplay) {
-                      pingDisplay.innerText = 'Unreachable';
-                      pingDisplay.className = 'text-danger';
+                    pingDisplay.innerText = 'Unreachable';
+                    pingDisplay.className = 'text-danger';
                   }
+                  const msLabel = document.getElementById(`ms-label-${ipId}`);
+                  if (msLabel) msLabel.style.display = 'none';
                 }
 
                 // 1. Update Text di Popup Map
@@ -1617,6 +1652,7 @@ function startPing(siteId, ipAddress, index) {
       }, 300);
 
     });
+
     // Delete Site dengan SweetAlert2 dan Fetch API
     document.addEventListener('DOMContentLoaded', function () {
       // Gunakan event delegation supaya lebih aman jika ada penambahan baris dinamis
