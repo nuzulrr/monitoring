@@ -1411,7 +1411,7 @@
                 </h6>
                 <hr style="margin:5px 0;">
                 <table style="width:100%;font-size:12px;">
-                    <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site}" style="color:gray">Checking...</b></td></tr>
+                    <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site ?? '-'}" style="color:gray">Checking...</b></td></tr>
                     <tr><td><b>IP:</b></td><td>${item.ip_address ?? '-'}</td></tr>
                     <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
                 </table>
@@ -1700,130 +1700,7 @@ function startPing(siteId, ipAddress, index) {
         });
       });
     }); // Realtime Status Check JS
-    const sites = @json($sites);
 
-    async function updateRealtimeStatus() {
-
-      for (const site of sites) {
-
-        const ip = site.ip_address;
-        const ipId = ip ? ip.replace(/\./g, '-') : null;
-
-        const dot = document.getElementById(`dot-${ipId}`);
-        const pingDisplay = document.getElementById(`ping-value-${ipId}`);
-        const marker = markerInstances[site.id_site];
-
-        // =========================
-        // 🔥 HANDLE NO IP
-        // =========================
-        if (!ip || ip.trim() === '') {
-
-          if (dot && pingDisplay) {
-            pingDisplay.innerText = 'No IP';
-            pingDisplay.className = 'text-secondary';
-            dot.className = 'status-pill secondary';
-          }
-
-          if (marker && marker.getElement()) {
-            const el = marker.getElement();
-            el.className = 'status-icon status-unreachable';
-          }
-
-          continue;
-        }
-
-        try {
-
-          const response = await fetch(`/api/check-status?ip=${ip}`);
-
-          if (!response.ok) throw new Error('Server error');
-
-          const data = await response.json();
-
-          // =========================
-          // 🔥 UPDATE TABLE
-          // =========================
-          if (data.status === 'online') {
-
-            if (pingDisplay) {
-              pingDisplay.innerText = data.response_time + ' ms';
-              pingDisplay.className = 'text-success';
-            }
-
-            if (dot) {
-              dot.className = 'status-pill success';
-            }
-
-          } else if (data.status === 'offline') {
-
-            if (pingDisplay) {
-              pingDisplay.innerText = 'Timeout';
-              pingDisplay.className = 'text-warning';
-            }
-
-            if (dot) {
-              dot.className = 'status-pill warning';
-            }
-
-          } else {
-
-            if (pingDisplay) {
-              pingDisplay.innerText = 'Unreachable';
-              pingDisplay.className = 'text-danger';
-            }
-
-            if (dot) {
-              dot.className = 'status-pill danger';
-            }
-          }
-
-          // =========================
-          // 🔥 UPDATE MARKER (INI FIX NYA)
-          // =========================
-          if (marker && marker.getElement()) {
-
-            const el = marker.getElement();
-
-            // RESET CLASS
-            el.className = 'status-icon';
-
-            if (data.status === 'online') {
-
-              el.classList.add('status-online');
-
-            } else if (data.status === 'offline') {
-
-              el.classList.add('status-offline');
-
-            } else {
-
-              el.classList.add('status-unreachable');
-            }
-          }
-
-        } catch (error) {
-
-          console.error('Error checking IP:', ip);
-
-          if (pingDisplay) {
-            pingDisplay.innerText = 'Unreachable';
-            pingDisplay.className = 'text-danger';
-          }
-
-          if (dot) {
-            dot.className = 'status-pill danger';
-          }
-
-          // 🔥 UPDATE MARKER ERROR
-          if (marker && marker.getElement()) {
-            const el = marker.getElement();
-            el.className = 'status-icon status-unreachable';
-          }
-        }
-      }
-    } // 🚀 RUN
-    updateRealtimeStatus();
-    setInterval(updateRealtimeStatus, 10000);
 
     // realtime clock js
     function updateClock() {
