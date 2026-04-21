@@ -370,7 +370,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                            success ') }}',
+                                success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -1461,105 +1461,143 @@
 
         marker.bindPopup(popupContent);
         markersCoordinates.push([lat, lng]);
-        if (item.ip_address) {
-          startPing(item.id_site, item.ip_address, sites.indexOf(item));
-        }
       });
 
-      function startPing(siteId, ipAddress, index) {
-        // Bersihkan interval lama jika ada
-        if (activeIntervals[siteId]) clearInterval(activeIntervals[siteId]);
+      // 🔥 OPTIMIZED: Queue-based Status Checking dengan Concurrent Limit
+      let checkQueue = [];
+      let activeChecks = 0;
+      let isInitialCheck = true;
+      const MAX_CONCURRENT_INITIAL = 10; // Max 10 request bersamaan untuk initial check
+      const MAX_CONCURRENT_RECURRING = 3; // Max 3 request bersamaan untuk recurring
+      const CHECK_INTERVAL = 30000; // Check setiap 30 detik
 
-        const ipId = ipAddress.replace(/\./g, '-');
-
-        // Beri jeda 200ms per site agar request tidak menumpuk menabrak server di detik yang sama
-        setTimeout(() => {
-          const performCheck = () => {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 detik timeout
-
-            fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
-              .then(response => response.json())
-              .then(data => {
-                clearTimeout(timeoutId);
-
-                const marker = markerInstances[siteId];
-                const statusElement = document.getElementById(`status-text-${siteId}`);
-                const pingDisplay = document.getElementById(`ping-value-${ipId}`);
-                const dot = document.getElementById(`dot-${ipId}`);
-
-                let statusClass = 'status-unreachable';
-                let statusText = 'Unreachable';
-                let textColor = '#dc3545';
-                let dotClass = 'status-pill danger';
-
-                if (data.status === 'online') {
-                  statusClass = 'status-online';
-                  statusText = `Online (${data.response_time}ms)`;
-                  textColor = '#198754';
-                  dotClass = 'status-pill success';
-
-                  if (pingDisplay) {
-                    pingDisplay.innerText = data.response_time;
-                    pingDisplay.className = 'text-success fw-bold';
-                  }
-                  const msLabel = document.getElementById(`ms-label-${ipId}`);
-                  if (msLabel) msLabel.style.display = 'inline';
-                } else if (data.status === 'offline') {
-                  statusClass = 'status-timeout';
-                  statusText = 'Timeout';
-                  textColor = '#ffc107';
-                  dotClass = 'status-pill warning';
-
-                  if (pingDisplay) {
-                    pingDisplay.innerText = 'Timeout';
-                    pingDisplay.className = 'text-warning';
-                  }
-                  const msLabel = document.getElementById(`ms-label-${ipId}`);
-                  if (msLabel) msLabel.style.display = 'none';
-                } else {
-                  if (pingDisplay) {
-                    pingDisplay.innerText = 'Unreachable';
-                    pingDisplay.className = 'text-danger';
-                  }
-                  const msLabel = document.getElementById(`ms-label-${ipId}`);
-                  if (msLabel) msLabel.style.display = 'none';
-                }
-
-                // 1. Update Text di Popup Map
-                if (statusElement) {
-                  statusElement.innerText = statusText;
-                  statusElement.style.color = textColor;
-                }
-
-                // 2. Update Icon Marker di Map
-                if (marker) {
-                  marker.setIcon(L.divIcon({ className: `status-icon ${statusClass}`, html: '' }));
-                }
-
-                // 3. Update Dot Status di Tabel
-                if (dot) {
-                  dot.className = dotClass;
-                }
-              })
-              .catch(err => {
-                // Jika error/timeout, ubah tampilan jadi merah/error
-                const statusElement = document.getElementById(`status-text-${siteId}`);
-                if (statusElement) {
-                  statusElement.innerText = "Unreachable";
-                  statusElement.style.color = "#dc3545";
-                }
-              });
-          };
-
-          // Jalankan pengecekan pertama kali
-          performCheck();
-
-          // Ulangi pengecekan setiap 15 detik
-          activeIntervals[siteId] = setInterval(performCheck, 15000);
-
-        }, index * 200); // <-- Kunci kecepatannya ada di sini (Staggering)
+      function createCheckQueue(sitesData) {
+        checkQueue = sitesData.filter(site => site.ip_address).map(site => ({
+          siteId: site.id_site,
+          ipAddress: site.ip_address
+        }));
+        processCheckQueue();
       }
+
+      function processCheckQueue() {
+        const MAX_CONCURRENT = isInitialCheck ? MAX_CONCURRENT_INITIAL : MAX_CONCURRENT_RECURRING;
+
+        while (activeChecks < MAX_CONCURRENT && checkQueue.length > 0) {
+          const site = checkQueue.shift();
+          activeChecks++;
+          performCheck(site.siteId, site.ipAddress);
+        }
+      }
+
+      function performCheck(siteId, ipAddress) {
+        const ipId = ipAddress.replace(/\./g, '-');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
+          .then(response => response.json())
+          .then(data => {
+            clearTimeout(timeoutId);
+            updateSiteUI(siteId, ipAddress, data);
+          })
+          .catch(err => {
+            clearTimeout(timeoutId);
+            updateSiteUI(siteId, ipAddress, { status: 'unreachable', response_time: 0 });
+          })
+          .finally(() => {
+            activeChecks--;
+            processCheckQueue();
+
+            // Cek apakah initial check selesai
+            if (isInitialCheck && checkQueue.length === 0 && activeChecks === 0) {
+              isInitialCheck = false;
+            }
+          });
+      }
+
+      function updateSiteUI(siteId, ipAddress, result) {
+        const ipId = ipAddress.replace(/\./g, '-');
+        const marker = markerInstances[siteId];
+        const statusElement = document.getElementById(`status-text-${siteId}`);
+        const pingDisplay = document.getElementById(`ping-value-${ipId}`);
+        const dot = document.getElementById(`dot-${ipId}`);
+
+        let statusClass = 'status-unreachable';
+        let statusText = 'Unreachable';
+        let textColor = '#dc3545';
+        let dotClass = 'status-pill danger';
+
+        if (result.status === 'online') {
+          statusClass = 'status-online';
+          statusText = `Online (${result.response_time}ms)`;
+          textColor = '#198754';
+          dotClass = 'status-pill success';
+
+          if (pingDisplay) {
+            pingDisplay.innerText = result.response_time;
+            pingDisplay.className = 'text-success fw-bold';
+          }
+          const msLabel = document.getElementById(`ms-label-${ipId}`);
+          if (msLabel) msLabel.style.display = 'inline';
+        } else if (result.status === 'offline') {
+          statusClass = 'status-timeout';
+          statusText = 'Timeout';
+          textColor = '#ffc107';
+          dotClass = 'status-pill warning';
+
+          if (pingDisplay) {
+            pingDisplay.innerText = 'Timeout';
+            pingDisplay.className = 'text-warning';
+          }
+          const msLabel = document.getElementById(`ms-label-${ipId}`);
+          if (msLabel) msLabel.style.display = 'none';
+        } else {
+          if (pingDisplay) {
+            pingDisplay.innerText = 'Unreachable';
+            pingDisplay.className = 'text-danger';
+          }
+          const msLabel = document.getElementById(`ms-label-${ipId}`);
+          if (msLabel) msLabel.style.display = 'none';
+        }
+
+        // Update Status di Popup jika marker ada & popup terbuka
+        if (statusElement) {
+          statusElement.innerText = statusText;
+          statusElement.style.color = textColor;
+        }
+
+        // Update Marker Icon
+        if (marker) {
+          marker.setIcon(L.divIcon({ className: `status-icon ${statusClass}`, html: '' }));
+
+          // 🔥 Update popup content secara realtime (jika popup sedang dibuka)
+          if (marker.isPopupOpen && marker.isPopupOpen()) {
+            const popup = marker.getPopup();
+            if (popup) {
+              const statusElementInPopup = popup.getElement()?.querySelector(`[id="status-text-${siteId}"]`);
+              if (statusElementInPopup) {
+                statusElementInPopup.innerText = statusText;
+                statusElementInPopup.style.color = textColor;
+              }
+            }
+          }
+        }
+
+        // Update Dot Status di Tabel
+        if (dot) {
+          dot.className = dotClass;
+        }
+      }
+
+      // 🔥 Initial check dengan concurrent limit tinggi
+      createCheckQueue(sites);
+
+      // 🔥 Recurring check setiap 30 detik dengan concurrent limit rendah
+      setInterval(() => {
+        if (checkQueue.length === 0 && activeChecks === 0) {
+          createCheckQueue(sites);
+        }
+      }, CHECK_INTERVAL);
       // =========================
       // 🔥 AUTO FIT BOUNDS
       // =========================
