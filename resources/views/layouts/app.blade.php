@@ -1617,7 +1617,7 @@
         btn.addEventListener('click', function () {
 
           // ACTIVE BUTTON
-          filterButtons.forEach(b => b.classList.remove('active'));
+          filterButtons.forEach(b => b.classList.remove('active'));g
           this.classList.add('active');
 
           const selectedKategori = this.getAttribute('data-kategori');
