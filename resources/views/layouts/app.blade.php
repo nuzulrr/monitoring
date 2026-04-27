@@ -1558,7 +1558,7 @@
           // Ulangi pengecekan setiap 15 detik
           activeIntervals[siteId] = setInterval(performCheck, 15000);
 
-        }, index * 200); // <-- Kunci kecepatannya ada di sini (Staggering)
+        }, index * 200); // 
       }
       // =========================
       // 🔥 AUTO FIT BOUNDS
