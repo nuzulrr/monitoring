@@ -370,7 +370,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                                success ') }}',
+                                    success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -1324,386 +1324,422 @@
       });
 
     function confirmSaveLokasi() {
+      try {
+        let projek = document.querySelector('[name="id_projek"]').value;
+        let alamat = document.querySelector('[name="alamat"]').value;
+        let ip = document.querySelector('[name="ip_address"]').value;
+        let tgl = document.querySelector('[name="tgl_instalasi"]').value;
+        let lat = document.getElementById('lat').value;
+        let lng = document.getElementById('lng').value;
 
-      let projek = document.querySelector('[name="id_projek"]').value;
-      let alamat = document.querySelector('[name="alamat"]').value;
-      let ip = document.querySelector('[name="ip_address"]').value;
-      let tgl = document.querySelector('[name="tgl_instalasi"]').value;
-      let lat = document.getElementById('lat').value;
-      let lng = document.getElementById('lng').value;
+        // VALIDASI
+        if (projek === '') {
+          Swal.fire('Oops!', 'Projek wajib dipilih!', 'error');
+          return;
+        }
+        if (alamat === '') {
+          Swal.fire('Oops!', 'Alamat wajib diisi!', 'error');
+          return;
+        }
+        if (ip === '') {
+          Swal.fire('Oops!', 'IP wajib diisi!', 'error');
+          return;
+        }
+        if (tgl === '') {
+          Swal.fire('Oops!', 'Tanggal wajib diisi!', 'error');
+          return;
+        }
+        if (lat === '' || lng === '') {
+          Swal.fire('Oops!', 'Klik map dulu!', 'error');
+          return;
+        }
 
-      // VALIDASI
-      if (projek === '') {
-        Swal.fire('Oops!', 'Projek wajib dipilih!', 'error');
-        return;
-      }
-      if (alamat === '') {
-        Swal.fire('Oops!', 'Alamat wajib diisi!', 'error');
-        return;
-      }
-      if (ip === '') {
-        Swal.fire('Oops!', 'IP wajib diisi!', 'error');
-        return;
-      }
-      if (tgl === '') {
-        Swal.fire('Oops!', 'Tanggal wajib diisi!', 'error');
-        return;
-      }
-      if (lat === '' || lng === '') {
-        Swal.fire('Oops!', 'Klik map dulu!', 'error');
-        return;
-      }
+        // 🔥 CLEAR MAP SEBELUM SUBMIT UNTUK MENCEGAH MEMORY LEAK
+        if (map) {
+          try {
+            map.remove();
+            map = null;
+          } catch (e) {
+            console.warn('Error removing map:', e);
+          }
+        }
 
-      // 🔥 TUTUP MODAL
-      let modalEl = document.getElementById('modalLokasi');
-      let modal = bootstrap.Modal.getInstance(modalEl);
-      if (modal) {
-        modal.hide();
+        // 🔥 TUTUP MODAL
+        let modalEl = document.getElementById('modalLokasi');
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+          modal.hide();
+        }
+
+        // 🔥 LOADING
+        Swal.fire({
+          title: 'Menyimpan...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        // SUBMIT dengan delay kecil untuk memastikan modal sudah menutup
+        setTimeout(() => {
+          document.getElementById('formLokasi').submit();
+        }, 200);
+
+      } catch (err) {
+        console.error('Error in confirmSaveLokasi:', err);
+        Swal.fire('Error!', 'Terjadi kesalahan: ' + err.message, 'error');
       }
-
-      // 🔥 LOADING
-      Swal.fire({
-        title: 'Menyimpan...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      // SUBMIT
-      document.getElementById('formLokasi').submit();
     }
     // maphome
 
     let mapHome;
     let markerInstances = {}; // 🔥 GLOBAL (WAJIB)
     let activeIntervals = {};
+    let isMapInitialized = false; // 🔥 Flag untuk mencegah multiple initialization
 
     document.addEventListener('DOMContentLoaded', function () {
 
-      // =========================
-      // 🔥 INIT MAP
-      // =========================
-      mapHome = L.map('map-home', {
-        scrollWheelZoom: false,
-        dragging: false,
-        touchZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false
-      }).setView([-2.5489, 118.0149], 5);
+      try {
 
-      // =========================================
-      // 🔥 LOAD PETA INDONESIA (NO LABEL)
-      // =========================================
-      fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json')
-        .then(res => res.json())
-        .then(data => {
+        // 🔥 DESTROY MAP LAMA (FIX UTAMA)
+        if (window.mapHome) {
+          try {
+            window.mapHome.remove();
+          } catch (e) {
+            console.warn('Error removing old map:', e);
+          }
+        }
 
-          const geoLayer = L.geoJSON(data, {
-            style: {
-              fillColor: '#7a6b6b',
-              color: '#3a2a2a',
-              weight: 1,
-              fillOpacity: 1
-            }
+        // RESET GLOBAL
+        window.mapHome = null;
+        markerInstances = {};
+
+        // =========================
+        // 🔥 INIT MAP
+        // =========================
+        mapHome = L.map('map-home', {
+          scrollWheelZoom: false,
+          dragging: false,
+          touchZoom: false,
+          doubleClickZoom: false,
+          boxZoom: false,
+          keyboard: false
+        }).setView([-2.5489, 118.0149], 5);
+
+        window.mapHome = mapHome;
+
+        // =========================================
+        // 🔥 LOAD PETA INDONESIA (NO LABEL)
+        // =========================================
+        fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json')
+          .then(res => res.json())
+          .then(data => {
+
+            const geoLayer = L.geoJSON(data, {
+              style: {
+                fillColor: '#7a6b6b',
+                color: '#7a6b6b',
+                weight: 1,
+                fillOpacity: 1
+              }
+            }).addTo(mapHome);
+
+            mapHome.fitBounds(geoLayer.getBounds());
+          })
+          .catch(err => console.error('GeoJSON error:', err));
+
+        const sites = @json($sites);
+        const markersCoordinates = [];
+
+        // =========================
+        // 🔥 CREATE MARKERS
+        // =========================
+        sites.forEach(function (item) {
+
+          // 🔥 FIX VALIDASI (biar 0 nggak ke-skip)
+          if (item.latitude == null || item.longitude == null) return;
+
+          const lat = parseFloat(item.latitude);
+          const lng = parseFloat(item.longitude);
+
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: 'status-icon status-checking',
+              html: ''
+            })
           }).addTo(mapHome);
 
-          mapHome.fitBounds(geoLayer.getBounds());
-        })
-        .catch(err => console.error('GeoJSON error:', err));
+          // 🔥 Save GLOBAL
+          markerInstances[item.id_site] = marker;
 
-      const sites = @json($sites);
-      const markersCoordinates = [];
+          const namaProjek = (item.projek_ref && item.projek_ref.nama_projek) ?
+            item.projek_ref.nama_projek :
+            (item.projek || 'Tanpa Nama Projek');
 
-      // =========================
-      // 🔥 CREATE MARKERS
-      // =========================
-      sites.forEach(function (item) {
+          const popupContent = `
+          <div style="font-family: sans-serif; min-width: 180px;">
+              <h6 style="margin:0 0 5px 0;color:#007bff;">
+                  ${namaProjek} - ${item.projek ?? '-'}
+              </h6>
+              <hr style="margin:5px 0;">
+              <table style="width:100%;font-size:12px;">
+                  <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site ?? '-'}" style="color:gray">Checking...</b></td></tr>
+                  <tr><td><b>IP:</b></td><td>${item.ip_address ?? '-'}</td></tr>
+                  <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
+              </table>
+          </div>
+      `;
 
-        if (!item.latitude || !item.longitude) return;
-
-        const lat = parseFloat(item.latitude);
-        const lng = parseFloat(item.longitude);
-
-        if (isNaN(lat) || isNaN(lng)) return;
-
-        const customIcon = L.divIcon({
-          className: 'status-icon status-checking',
-          html: ''
+          marker.bindPopup(popupContent);
+          markersCoordinates.push([lat, lng]);
         });
 
-        const marker = L.marker([lat, lng], {
-          icon: L.divIcon({
-            className: 'status-icon status-checking',
-            html: ''
-          })
-        }).addTo(mapHome);
+        // 🔥 OPTIMIZED: Queue-based Status Checking dengan Concurrent Limit
+        let checkQueue = [];
+        let activeChecks = 0;
+        let isInitialCheck = true;
+        const MAX_CONCURRENT_INITIAL = 10;
+        const MAX_CONCURRENT_RECURRING = 3;
+        const CHECK_INTERVAL = 30000;
 
-        // 🔥 Save GLOBAL
-        markerInstances[item.id_site] = marker;
-
-        const namaProjek = (item.projek_ref && item.projek_ref.nama_projek) ?
-          item.projek_ref.nama_projek :
-          (item.projek || 'Tanpa Nama Projek');
-
-        const popupContent = `
-            <div style="font-family: sans-serif; min-width: 180px;">
-                <h6 style="margin:0 0 5px 0;color:#007bff;">
-                    ${namaProjek} - ${item.projek ?? '-'}
-                </h6>
-                <hr style="margin:5px 0;">
-                <table style="width:100%;font-size:12px;">
-                    <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site ?? '-'}" style="color:gray">Checking...</b></td></tr>
-                    <tr><td><b>IP:</b></td><td>${item.ip_address ?? '-'}</td></tr>
-                    <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
-                </table>
-            </div>
-        `;
-
-        marker.bindPopup(popupContent);
-        markersCoordinates.push([lat, lng]);
-      });
-
-      // 🔥 OPTIMIZED: Queue-based Status Checking dengan Concurrent Limit
-      let checkQueue = [];
-      let activeChecks = 0;
-      let isInitialCheck = true;
-      const MAX_CONCURRENT_INITIAL = 10; // Max 10 request bersamaan untuk initial check
-      const MAX_CONCURRENT_RECURRING = 3; // Max 3 request bersamaan untuk recurring
-      const CHECK_INTERVAL = 30000; // Check setiap 30 detik
-
-      function createCheckQueue(sitesData) {
-        checkQueue = sitesData.filter(site => site.ip_address).map(site => ({
-          siteId: site.id_site,
-          ipAddress: site.ip_address
-        }));
-        processCheckQueue();
-      }
-
-      function processCheckQueue() {
-        const MAX_CONCURRENT = isInitialCheck ? MAX_CONCURRENT_INITIAL : MAX_CONCURRENT_RECURRING;
-
-        while (activeChecks < MAX_CONCURRENT && checkQueue.length > 0) {
-          const site = checkQueue.shift();
-          activeChecks++;
-          performCheck(site.siteId, site.ipAddress);
-        }
-      }
-
-      function performCheck(siteId, ipAddress) {
-        const ipId = ipAddress.replace(/\./g, '-');
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
-          .then(response => response.json())
-          .then(data => {
-            clearTimeout(timeoutId);
-            updateSiteUI(siteId, ipAddress, data);
-          })
-          .catch(err => {
-            clearTimeout(timeoutId);
-            updateSiteUI(siteId, ipAddress, { status: 'unreachable', response_time: 0 });
-          })
-          .finally(() => {
-            activeChecks--;
-            processCheckQueue();
-
-            // Cek apakah initial check selesai
-            if (isInitialCheck && checkQueue.length === 0 && activeChecks === 0) {
-              isInitialCheck = false;
-            }
-          });
-      }
-
-      function updateSiteUI(siteId, ipAddress, result) {
-        const ipId = ipAddress.replace(/\./g, '-');
-        const marker = markerInstances[siteId];
-        const statusElement = document.getElementById(`status-text-${siteId}`);
-        const pingDisplay = document.getElementById(`ping-value-${ipId}`);
-        const dot = document.getElementById(`dot-${ipId}`);
-
-        let statusClass = 'status-unreachable';
-        let statusText = 'Unreachable';
-        let textColor = '#dc3545';
-        let dotClass = 'status-pill danger';
-
-        if (result.status === 'online') {
-          statusClass = 'status-online';
-          statusText = `Online (${result.response_time}ms)`;
-          textColor = '#198754';
-          dotClass = 'status-pill success';
-
-          if (pingDisplay) {
-            pingDisplay.innerText = result.response_time;
-            pingDisplay.className = 'text-success fw-bold';
-          }
-          const msLabel = document.getElementById(`ms-label-${ipId}`);
-          if (msLabel) msLabel.style.display = 'inline';
-        } else if (result.status === 'offline') {
-          statusClass = 'status-timeout';
-          statusText = 'Timeout';
-          textColor = '#ffc107';
-          dotClass = 'status-pill warning';
-
-          if (pingDisplay) {
-            pingDisplay.innerText = 'Timeout';
-            pingDisplay.className = 'text-warning';
-          }
-          const msLabel = document.getElementById(`ms-label-${ipId}`);
-          if (msLabel) msLabel.style.display = 'none';
-        } else {
-          if (pingDisplay) {
-            pingDisplay.innerText = 'Unreachable';
-            pingDisplay.className = 'text-danger';
-          }
-          const msLabel = document.getElementById(`ms-label-${ipId}`);
-          if (msLabel) msLabel.style.display = 'none';
+        function createCheckQueue(sitesData) {
+          checkQueue = sitesData.filter(site => site.ip_address).map(site => ({
+            siteId: site.id_site,
+            ipAddress: site.ip_address
+          }));
+          processCheckQueue();
         }
 
-        // Update Status di Popup jika marker ada & popup terbuka
-        if (statusElement) {
-          statusElement.innerText = statusText;
-          statusElement.style.color = textColor;
+        function processCheckQueue() {
+          const MAX_CONCURRENT = isInitialCheck ? MAX_CONCURRENT_INITIAL : MAX_CONCURRENT_RECURRING;
+
+          while (activeChecks < MAX_CONCURRENT && checkQueue.length > 0) {
+            const site = checkQueue.shift();
+            activeChecks++;
+            performCheck(site.siteId, site.ipAddress);
+          }
         }
 
-        // Update Marker Icon
-        if (marker) {
-          marker.setIcon(L.divIcon({ className: `status-icon ${statusClass}`, html: '' }));
+        function performCheck(siteId, ipAddress) {
+          const ipId = ipAddress.replace(/\./g, '-');
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-          // 🔥 Update popup content secara realtime (jika popup sedang dibuka)
-          if (marker.isPopupOpen && marker.isPopupOpen()) {
-            const popup = marker.getPopup();
-            if (popup) {
-              const statusElementInPopup = popup.getElement()?.querySelector(`[id="status-text-${siteId}"]`);
-              if (statusElementInPopup) {
-                statusElementInPopup.innerText = statusText;
-                statusElementInPopup.style.color = textColor;
+          fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
+            .then(response => response.json())
+            .then(data => {
+              clearTimeout(timeoutId);
+              updateSiteUI(siteId, ipAddress, data);
+            })
+            .catch(err => {
+              clearTimeout(timeoutId);
+              updateSiteUI(siteId, ipAddress, { status: 'unreachable', response_time: 0 });
+            })
+            .finally(() => {
+              activeChecks--;
+              processCheckQueue();
+
+              if (isInitialCheck && checkQueue.length === 0 && activeChecks === 0) {
+                isInitialCheck = false;
               }
-            }
-          }
+            });
         }
 
-        // Update Dot Status di Tabel
-        if (dot) {
-          dot.className = dotClass;
-        }
-      }
+        function updateSiteUI(siteId, ipAddress, result) {
+          try {
+            const ipId = ipAddress.replace(/\./g, '-');
+            const marker = markerInstances[siteId];
+            const statusElement = document.getElementById(`status-text-${siteId}`);
+            const pingDisplay = document.getElementById(`ping-value-${ipId}`);
+            const dot = document.getElementById(`dot-${ipId}`);
 
-      // 🔥 Initial check dengan concurrent limit tinggi
-      createCheckQueue(sites);
+            let statusClass = 'status-unreachable';
+            let statusText = 'Unreachable';
+            let textColor = '#dc3545';
+            let dotClass = 'status-pill danger';
 
-      // 🔥 Recurring check setiap 30 detik dengan concurrent limit rendah
-      setInterval(() => {
-        if (checkQueue.length === 0 && activeChecks === 0) {
-          createCheckQueue(sites);
-        }
-      }, CHECK_INTERVAL);
-      // =========================
-      // 🔥 AUTO FIT BOUNDS
-      // =========================
-      if (markersCoordinates.length > 0) {
-        mapHome.fitBounds(L.latLngBounds(markersCoordinates), {
-          padding: [50, 50]
-        });
-      }
+            if (result.status === 'online') {
+              statusClass = 'status-online';
+              statusText = `Online (${result.response_time}ms)`;
+              textColor = '#198754';
+              dotClass = 'status-pill success';
 
-      // =========================
-      // 🔥 FILTER LOGIC (INI INTI)
-      // =========================
-      const filterButtons = document.querySelectorAll('.top-nav-btn');
-      const rows = document.querySelectorAll('tbody tr');
+              if (pingDisplay) {
+                pingDisplay.innerText = result.response_time;
+                pingDisplay.className = 'text-success fw-bold';
+              }
+              const msLabel = document.getElementById(`ms-label-${ipId}`);
+              if (msLabel) msLabel.style.display = 'inline';
+            } else if (result.status === 'offline') {
+              statusClass = 'status-timeout';
+              statusText = 'Timeout';
+              textColor = '#ffc107';
+              dotClass = 'status-pill warning';
 
-      filterButtons.forEach(btn => {
-        btn.addEventListener('click', function () {
-
-          // ACTIVE BUTTON
-          filterButtons.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-
-          const selectedKategori = this.getAttribute('data-kategori');
-
-          // =========================
-          // 🔥 FILTER TABLE
-          // =========================
-          rows.forEach(row => {
-            const kategori = row.getAttribute('data-kategori');
-
-            if (selectedKategori === 'all' || kategori ===
-              selectedKategori) {
-              row.style.display = '';
+              if (pingDisplay) {
+                pingDisplay.innerText = 'Timeout';
+                pingDisplay.className = 'text-warning';
+              }
+              const msLabel = document.getElementById(`ms-label-${ipId}`);
+              if (msLabel) msLabel.style.display = 'none';
             } else {
-              row.style.display = 'none';
+              if (pingDisplay) {
+                pingDisplay.innerText = 'Unreachable';
+                pingDisplay.className = 'text-danger';
+              }
+              const msLabel = document.getElementById(`ms-label-${ipId}`);
+              if (msLabel) msLabel.style.display = 'none';
             }
+
+            if (statusElement) {
+              statusElement.innerText = statusText;
+              statusElement.style.color = textColor;
+            }
+
+            if (marker) {
+              marker.setIcon(L.divIcon({ className: `status-icon ${statusClass}`, html: '' }));
+
+              try {
+                if (marker.isPopupOpen && marker.isPopupOpen()) {
+                  const popup = marker.getPopup();
+                  if (popup) {
+                    const popupEl = popup.getElement();
+                    if (popupEl) {
+                      const statusElementInPopup = popupEl.querySelector(`[id="status-text-${siteId}"]`);
+                      if (statusElementInPopup) {
+                        statusElementInPopup.innerText = statusText;
+                        statusElementInPopup.style.color = textColor;
+                      }
+                    }
+                  }
+                }
+              } catch (popupErr) {
+                console.warn('Popup update error:', popupErr);
+              }
+            }
+
+            if (dot) {
+              dot.className = dotClass;
+            }
+          } catch (err) {
+            console.error('Error updating site UI:', err);
+          }
+        }
+
+        createCheckQueue(sites);
+
+        setInterval(() => {
+          try {
+            if (checkQueue.length === 0 && activeChecks === 0) {
+              createCheckQueue(sites);
+            }
+          } catch (err) {
+            console.error('Error in recurring check:', err);
+          }
+        }, CHECK_INTERVAL);
+
+        if (markersCoordinates.length > 0) {
+          mapHome.fitBounds(L.latLngBounds(markersCoordinates), {
+            padding: [50, 50]
           });
+        }
 
-          // =========================
-          // 🔥 FILTER MARKER
-          // =========================
-          sites.forEach(site => {
+        const filterButtons = document.querySelectorAll('.top-nav-btn');
+        const rows = document.querySelectorAll('tbody tr');
 
-            const marker = markerInstances[site.id_site];
-            if (!marker) return;
+        filterButtons.forEach(btn => {
+          btn.addEventListener('click', function () {
 
-            if (selectedKategori === 'all' || site.kategori ===
-              selectedKategori) {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
 
-              if (!mapHome.hasLayer(marker)) {
-                mapHome.addLayer(marker);
+            const selectedKategori = this.getAttribute('data-kategori');
+
+            rows.forEach(row => {
+              const kategori = row.getAttribute('data-kategori');
+
+              if (selectedKategori === 'all' || kategori === selectedKategori) {
+                row.style.display = '';
+              } else {
+                row.style.display = 'none';
+              }
+            });
+
+            sites.forEach(site => {
+
+              const marker = markerInstances[site.id_site];
+              if (!marker) return;
+
+              if (selectedKategori === 'all' || site.kategori === selectedKategori) {
+
+                if (!mapHome.hasLayer(marker)) {
+                  mapHome.addLayer(marker);
+                }
+
+              } else {
+
+                if (mapHome.hasLayer(marker)) {
+                  mapHome.removeLayer(marker);
+                }
               }
 
-            } else {
+            });
 
-              if (mapHome.hasLayer(marker)) {
-                mapHome.removeLayer(marker);
-              }
-            }
           });
-
         });
-      });
 
-      // =========================
-      // 🔥 MAP INTERACTION CONTROL (BIAR GA KEGESER)
-      // =========================
-      const mapContainer = document.getElementById('map-home');
-      const overlay = document.getElementById('map-overlay');
+        const mapContainer = document.getElementById('map-home');
+        const overlay = document.getElementById('map-overlay');
 
-      function enableMap() {
-        mapHome.scrollWheelZoom.enable();
-        mapHome.dragging.enable();
-        mapHome.touchZoom.enable();
-        mapHome.doubleClickZoom.enable();
-        mapHome.boxZoom.enable();
-        mapHome.keyboard.enable();
+        function enableMap() {
+          try {
+            mapHome.scrollWheelZoom.enable();
+            mapHome.dragging.enable();
+            mapHome.touchZoom.enable();
+            mapHome.doubleClickZoom.enable();
+            mapHome.boxZoom.enable();
+            mapHome.keyboard.enable();
+          } catch (e) {
+            console.warn('Error enabling map controls:', e);
+          }
+        }
+
+        function disableMap() {
+          try {
+            mapHome.scrollWheelZoom.disable();
+            mapHome.dragging.disable();
+            mapHome.touchZoom.disable();
+            mapHome.doubleClickZoom.disable();
+            mapHome.boxZoom.disable();
+            mapHome.keyboard.disable();
+          } catch (e) {
+            console.warn('Error disabling map controls:', e);
+          }
+        }
+
+        overlay.addEventListener('click', () => {
+          overlay.style.display = 'none';
+          enableMap();
+        });
+
+        mapContainer.addEventListener('mouseleave', () => {
+          disableMap();
+          overlay.style.display = 'flex';
+        });
+
+        setTimeout(() => {
+          try {
+            mapHome.invalidateSize();
+          } catch (e) {
+            console.warn('Error invalidating map size:', e);
+          }
+        }, 300);
+
+      } catch (err) {
+        console.error('Fatal error in map initialization:', err);
       }
 
-      function disableMap() {
-        mapHome.scrollWheelZoom.disable();
-        mapHome.dragging.disable();
-        mapHome.touchZoom.disable();
-        mapHome.doubleClickZoom.disable();
-        mapHome.boxZoom.disable();
-        mapHome.keyboard.disable();
-      }
-
-      overlay.addEventListener('click', () => {
-        overlay.style.display = 'none';
-        enableMap();
-      });
-
-      mapContainer.addEventListener('mouseleave', () => {
-        disableMap();
-        overlay.style.display = 'flex';
-      });
-
-      // FIX RENDER
-      setTimeout(() => {
-        mapHome.invalidateSize();
-      }, 300);
-
-    });
-
-    // Delete Site dengan SweetAlert2 dan Fetch API
+    });    // Delete Site dengan SweetAlert2 dan Fetch API
     document.addEventListener('DOMContentLoaded', function () {
       // Gunakan event delegation supaya lebih aman jika ada penambahan baris dinamis
       document.addEventListener('click', function (e) {
@@ -1750,42 +1786,48 @@
         }).then((result) => {
 
           if (result.isConfirmed) {
+            try {
+              // 🔥 INI YANG BIKIN REALTIME HILANG DARI PETA
+              if (markerInstances[idSite]) {
+                console.log("Marker ditemukan, menghapus dari peta...");
 
-            // 🔥 INI YANG BIKIN REALTIME HILANG DARI PETA
-            if (markerInstances[idSite]) {
-              console.log("Marker ditemukan, menghapus dari peta...");
+                // Hapus dari tampilan peta
+                if (mapHome && mapHome.hasLayer(markerInstances[idSite])) {
+                  mapHome.removeLayer(markerInstances[idSite]);
+                }
 
-              // Hapus dari tampilan peta
-              mapHome.removeLayer(markerInstances[idSite]);
+                // Hapus dari daftar memori
+                delete markerInstances[idSite];
+              }
 
-              // Hapus dari daftar memori
-              delete markerInstances[idSite];
+              // Hentikan monitoring IP agar tidak error di console
+              if (activeIntervals[idSite]) {
+                clearInterval(activeIntervals[idSite]);
+                delete activeIntervals[idSite];
+              }
+
+              // Hapus baris tabel secara realtime
+              if (targetRow) {
+                targetRow.style.transition = "all 0.5s ease";
+                targetRow.style.opacity = "0";
+                targetRow.style.transform = "translateX(50px)";
+                setTimeout(() => targetRow.remove(), 500);
+              }
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Terhapus!',
+                timer: 1000,
+                showConfirmButton: false
+              });
+            } catch (err) {
+              console.error('Error deleting site:', err);
+              Swal.fire('Error!', 'Terjadi kesalahan saat menghapus: ' + err.message, 'error');
             }
-
-            // Hentikan monitoring IP agar tidak error di console
-            if (activeIntervals[idSite]) {
-              clearInterval(activeIntervals[idSite]);
-              delete activeIntervals[idSite];
-            }
-
-            // Hapus baris tabel secara realtime
-            if (targetRow) {
-              targetRow.style.transition = "all 0.5s ease";
-              targetRow.style.opacity = "0";
-              targetRow.style.transform = "translateX(50px)";
-              setTimeout(() => targetRow.remove(), 500);
-            }
-
-            Swal.fire({
-              icon: 'success',
-              title: 'Terhapus!',
-              timer: 1000,
-              showConfirmButton: false
-            });
           }
         });
       });
-    }); // Realtime Status Check JS
+    }, { once: true }); // 🔥 { once: true } untuk mencegah multiple listener // Realtime Status Check JS
 
 
     // realtime clock js
