@@ -56,6 +56,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
+
 <body data-pc-theme="dark">
   <div class="loader-bg">
     <div class="loader-track">
@@ -119,11 +120,19 @@
             <button type="button" class="top-nav-btn" data-kategori="3">Loreng</button>
           </div>
           <div class="ms-2 ps-3 d-flex">
-            <button type="button" class="btn btn-success btn-add-action me-2" data-bs-toggle="modal"
-              data-bs-target="#modalLokasi">
-              Add Site
-            </button>
 
+            <button type="button" class="button me-2 mb-2" data-bs-toggle="modal" data-bs-target="#modalLokasi">
+
+              <span class="button__text">Add Site</span>
+              <span class="button__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none"
+                  class="svg">
+                  <line y2="19" y1="5" x2="12" x1="12"></line>
+                  <line y2="12" y1="12" x2="19" x1="5"></line>
+                </svg>
+              </span>
+            </button>
             <!-- MODAL TAMBAH SITE -->
             <div class="modal fade" id="modalLokasi" tabindex="-1">
               <div class="modal-dialog modal-lg">
@@ -303,8 +312,15 @@
                 </div>
               </div>
             </div>
-            <button type="button" class="btn-add-action" data-bs-toggle="modal" data-bs-target="#modalProjek">
-              <i class=" me-1"></i> Add Project
+
+            <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#modalProjek">
+              <span class="button__text">Add Project</span>
+              <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24"
+                  fill="none" class="svg">
+                  <line y2="19" y1="5" x2="12" x1="12"></line>
+                  <line y2="12" y1="12" x2="19" x1="5"></line>
+                </svg></span>
             </button>
           </div>
         </div>
@@ -370,7 +386,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                                success ') }}',
+                                      success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -428,7 +444,7 @@
 
           <!-- 🔥 LIVE IP MONITORING (BESAR) -->
           <div class="col-xl-9 col-lg-8">
-            <div class="card card-dark-custom mb-4 h-100">
+            <div class="card card-dark-custom mb-4" style="height: auto; display: flex; flex-direction: column;">
               <div class="card-header border-0 pb-1 d-flex justify-content-between align-items-center">
                 <h5 class="text-white mb-0 d-flex align-items-center">
                   <i class="ph ph-monitor text-danger me-2 f-20"></i> Live IP Monitoring
@@ -480,9 +496,9 @@
 
               </script>
 
-              <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                  <table class="table table-ip mb-0">
+              <div class="card-body p-0" style="overflow-x: auto; max-height: none;">
+                <div style="display: block; overflow: visible;">
+                  <table class="table table-ip mb-0" style="width: 100%; margin-bottom: 0;">
                     <thead>
                       <tr class="text-center">
                         <th>Project</th>
@@ -543,6 +559,11 @@
 
                           <td class="text-center">
                             <div class="btn-group btn-group-sm">
+                              <button type="button" class="btn btn-outline-info border-0 btn-view-logs"
+                                data-id="{{ $s->id_site }}" data-ip="{{ $s->ip_address }}" data-bs-toggle="modal"
+                                data-bs-target="#modalDowntimeLogs" title="View Downtime Logs">
+                                <i class="ph ph-list"></i>
+                              </button>
                               <button type="button" class="btn btn-outline-primary border-0 btn-edit"
                                 data-id="{{ $s->id_site }}" data-projek_id="{{ $s->id_projek }}"
                                 data-projek_val="{{ $s->projek }}" data-ip="{{ $s->ip_address }}"
@@ -661,29 +682,44 @@
           <div class="col-xl-3 col-lg-4">
             <div class="card border-0 mb-3" style="background-color: #f8f9fa; border-radius: 12px;">
               <div class="card-body text-center p-3">
-                <h6 class="text-dark fw-bold mb-3 d-flex align-items-center justify-content-center"
+                <h6 class="text-dark fw-bold mb-4 d-flex align-items-center justify-content-center"
                   style="font-size: 14px;">
                   <span class="bg-danger me-2" style="width: 4px; height: 14px; border-radius: 2px;"></span>
                   System Status
                 </h6>
-                <div class="d-flex justify-content-around">
-                  <div>
-                    <div class="status-ring ring-success mb-1" style="width: 30px; height: 30px;">
+                <div class="d-flex justify-content-between gap-2" style="margin-bottom: 2rem;">
+                  <!-- Connected -->
+                  <div class="d-flex flex-column align-items-center flex-grow-1">
+                    <div class="status-ring ring-success mb-2" style="width: 40px; height: 40px;">
                       <div class="status-dot dot-success"></div>
                     </div>
-                    <span class="text-success fw-bold" style="font-size: 10px;">Connect</span>
+                    <span class="text-success fw-bold"
+                      style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Connected</span>
+                    <span id="count-connected" class="fw-bold mt-2"
+                      style="font-size: 24px; color: #198754; line-height: 1; font-weight: 700;">0</span>
+                    <span class="text-muted" style="font-size: 9px;">sites</span>
                   </div>
-                  <div>
-                    <div class="status-ring ring-warning mb-1" style="width: 30px; height: 30px;">
+                  <!-- Timeout -->
+                  <div class="d-flex flex-column align-items-center flex-grow-1">
+                    <div class="status-ring ring-warning mb-2" style="width: 40px; height: 40px;">
                       <div class="status-dot dot-warning"></div>
                     </div>
-                    <span class="text-warning fw-bold" style="font-size: 10px;">Timeout</span>
+                    <span class="text-warning fw-bold"
+                      style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Timeout</span>
+                    <span id="count-timeout" class="fw-bold mt-2"
+                      style="font-size: 24px; color: #ffc107; line-height: 1; font-weight: 700;">0</span>
+                    <span class="text-muted" style="font-size: 9px;">sites</span>
                   </div>
-                  <div>
-                    <div class="status-ring ring-danger mb-1" style="width: 30px; height: 30px;">
+                  <!-- Unreachable -->
+                  <div class="d-flex flex-column align-items-center flex-grow-1">
+                    <div class="status-ring ring-danger mb-2" style="width: 40px; height: 40px;">
                       <div class="status-dot dot-danger"></div>
                     </div>
-                    <span class="text-danger fw-bold" style="font-size: 10px;">Unreachable</span>
+                    <span class="text-danger fw-bold"
+                      style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Unreachable</span>
+                    <span id="count-unreachable" class="fw-bold mt-2"
+                      style="font-size: 24px; color: #dc3545; line-height: 1; font-weight: 700;">0</span>
+                    <span class="text-muted" style="font-size: 9px;">sites</span>
                   </div>
                 </div>
               </div>
@@ -1324,386 +1360,446 @@
       });
 
     function confirmSaveLokasi() {
+      try {
+        let projek = document.querySelector('[name="id_projek"]').value;
+        let alamat = document.querySelector('[name="alamat"]').value;
+        let ip = document.querySelector('[name="ip_address"]').value;
+        let tgl = document.querySelector('[name="tgl_instalasi"]').value;
+        let lat = document.getElementById('lat').value;
+        let lng = document.getElementById('lng').value;
 
-      let projek = document.querySelector('[name="id_projek"]').value;
-      let alamat = document.querySelector('[name="alamat"]').value;
-      let ip = document.querySelector('[name="ip_address"]').value;
-      let tgl = document.querySelector('[name="tgl_instalasi"]').value;
-      let lat = document.getElementById('lat').value;
-      let lng = document.getElementById('lng').value;
+        // VALIDASI
+        if (projek === '') {
+          Swal.fire('Oops!', 'Projek wajib dipilih!', 'error');
+          return;
+        }
+        if (alamat === '') {
+          Swal.fire('Oops!', 'Alamat wajib diisi!', 'error');
+          return;
+        }
+        if (ip === '') {
+          Swal.fire('Oops!', 'IP wajib diisi!', 'error');
+          return;
+        }
+        if (tgl === '') {
+          Swal.fire('Oops!', 'Tanggal wajib diisi!', 'error');
+          return;
+        }
+        if (lat === '' || lng === '') {
+          Swal.fire('Oops!', 'Klik map dulu!', 'error');
+          return;
+        }
 
-      // VALIDASI
-      if (projek === '') {
-        Swal.fire('Oops!', 'Projek wajib dipilih!', 'error');
-        return;
-      }
-      if (alamat === '') {
-        Swal.fire('Oops!', 'Alamat wajib diisi!', 'error');
-        return;
-      }
-      if (ip === '') {
-        Swal.fire('Oops!', 'IP wajib diisi!', 'error');
-        return;
-      }
-      if (tgl === '') {
-        Swal.fire('Oops!', 'Tanggal wajib diisi!', 'error');
-        return;
-      }
-      if (lat === '' || lng === '') {
-        Swal.fire('Oops!', 'Klik map dulu!', 'error');
-        return;
-      }
+        // 🔥 CLEAR MAP SEBELUM SUBMIT UNTUK MENCEGAH MEMORY LEAK
+        if (map) {
+          try {
+            map.remove();
+            map = null;
+          } catch (e) {
+            console.warn('Error removing map:', e);
+          }
+        }
 
-      // 🔥 TUTUP MODAL
-      let modalEl = document.getElementById('modalLokasi');
-      let modal = bootstrap.Modal.getInstance(modalEl);
-      if (modal) {
-        modal.hide();
+        // 🔥 TUTUP MODAL
+        let modalEl = document.getElementById('modalLokasi');
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+          modal.hide();
+        }
+
+        // 🔥 LOADING
+        Swal.fire({
+          title: 'Menyimpan...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        // SUBMIT dengan delay kecil untuk memastikan modal sudah menutup
+        setTimeout(() => {
+          document.getElementById('formLokasi').submit();
+        }, 200);
+
+      } catch (err) {
+        console.error('Error in confirmSaveLokasi:', err);
+        Swal.fire('Error!', 'Terjadi kesalahan: ' + err.message, 'error');
       }
-
-      // 🔥 LOADING
-      Swal.fire({
-        title: 'Menyimpan...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      // SUBMIT
-      document.getElementById('formLokasi').submit();
     }
     // maphome
 
     let mapHome;
     let markerInstances = {}; // 🔥 GLOBAL (WAJIB)
     let activeIntervals = {};
+    let isMapInitialized = false; // 🔥 Flag untuk mencegah multiple initialization
 
     document.addEventListener('DOMContentLoaded', function () {
 
-      // =========================
-      // 🔥 INIT MAP
-      // =========================
-      mapHome = L.map('map-home', {
-        scrollWheelZoom: false,
-        dragging: false,
-        touchZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false
-      }).setView([-2.5489, 118.0149], 5);
+      try {
 
-      // =========================================
-      // 🔥 LOAD PETA INDONESIA (NO LABEL)
-      // =========================================
-      fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json')
-        .then(res => res.json())
-        .then(data => {
+        // 🔥 DESTROY MAP LAMA (FIX UTAMA)
+        if (window.mapHome) {
+          try {
+            window.mapHome.remove();
+          } catch (e) {
+            console.warn('Error removing old map:', e);
+          }
+        }
 
-          const geoLayer = L.geoJSON(data, {
-            style: {
-              fillColor: '#7a6b6b',
-              color: '#3a2a2a',
-              weight: 1,
-              fillOpacity: 1
-            }
+        // RESET GLOBAL
+        window.mapHome = null;
+        markerInstances = {};
+
+        // =========================
+        // 🔥 INIT MAP
+        // =========================
+        mapHome = L.map('map-home', {
+          scrollWheelZoom: false,
+          dragging: false,
+          touchZoom: false,
+          doubleClickZoom: false,
+          boxZoom: false,
+          keyboard: false
+        }).setView([-2.5489, 118.0149], 5);
+
+        window.mapHome = mapHome;
+
+        // =========================================
+        // 🔥 LOAD PETA INDONESIA (NO LABEL)
+        // =========================================
+        fetch('https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json')
+          .then(res => res.json())
+          .then(data => {
+
+            const geoLayer = L.geoJSON(data, {
+              style: {
+                fillColor: '#7a6b6b',
+                color: '#7a6b6b',
+                weight: 1,
+                fillOpacity: 1
+              }
+            }).addTo(mapHome);
+
+            mapHome.fitBounds(geoLayer.getBounds());
+          })
+          .catch(err => console.error('GeoJSON error:', err));
+
+        const sites = @json($sites);
+        const markersCoordinates = [];
+
+        // =========================
+        // 🔥 CREATE MARKERS
+        // =========================
+        sites.forEach(function (item) {
+
+          // 🔥 FIX VALIDASI (biar 0 nggak ke-skip)
+          if (item.latitude == null || item.longitude == null) return;
+
+          const lat = parseFloat(item.latitude);
+          const lng = parseFloat(item.longitude);
+
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: 'status-icon status-checking',
+              html: ''
+            })
           }).addTo(mapHome);
 
-          mapHome.fitBounds(geoLayer.getBounds());
-        })
-        .catch(err => console.error('GeoJSON error:', err));
+          // 🔥 Save GLOBAL
+          markerInstances[item.id_site] = marker;
 
-      const sites = @json($sites);
-      const markersCoordinates = [];
+          const namaProjek = (item.projek_ref && item.projek_ref.nama_projek) ?
+            item.projek_ref.nama_projek :
+            (item.projek || 'Tanpa Nama Projek');
 
-      // =========================
-      // 🔥 CREATE MARKERS
-      // =========================
-      sites.forEach(function (item) {
+          const popupContent = `
+          <div style="font-family: sans-serif; min-width: 180px;">
+              <h6 style="margin:0 0 5px 0;color:#007bff;">
+                  ${namaProjek} - ${item.projek ?? '-'}
+              </h6>
+              <hr style="margin:5px 0;">
+              <table style="width:100%;font-size:12px;">
+                  <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site ?? '-'}" style="color:gray">Checking...</b></td></tr>
+                  <tr><td><b>IP:</b></td><td>${item.ip_address ?? '-'}</td></tr>
+                  <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
+              </table>
+          </div>
+      `;
 
-        if (!item.latitude || !item.longitude) return;
-
-        const lat = parseFloat(item.latitude);
-        const lng = parseFloat(item.longitude);
-
-        if (isNaN(lat) || isNaN(lng)) return;
-
-        const customIcon = L.divIcon({
-          className: 'status-icon status-checking',
-          html: ''
+          marker.bindPopup(popupContent);
+          markersCoordinates.push([lat, lng]);
         });
 
-        const marker = L.marker([lat, lng], {
-          icon: L.divIcon({
-            className: 'status-icon status-checking',
-            html: ''
-          })
-        }).addTo(mapHome);
+        // 🔥 OPTIMIZED: Queue-based Status Checking dengan Concurrent Limit
+        let checkQueue = [];
+        let activeChecks = 0;
+        let isInitialCheck = true;
+        const MAX_CONCURRENT_INITIAL = 10;
+        const MAX_CONCURRENT_RECURRING = 3;
+        const CHECK_INTERVAL = 30000;
 
-        // 🔥 Save GLOBAL
-        markerInstances[item.id_site] = marker;
-
-        const namaProjek = (item.projek_ref && item.projek_ref.nama_projek) ?
-          item.projek_ref.nama_projek :
-          (item.projek || 'Tanpa Nama Projek');
-
-        const popupContent = `
-            <div style="font-family: sans-serif; min-width: 180px;">
-                <h6 style="margin:0 0 5px 0;color:#007bff;">
-                    ${namaProjek} - ${item.projek ?? '-'}
-                </h6>
-                <hr style="margin:5px 0;">
-                <table style="width:100%;font-size:12px;">
-                    <tr><td><b>Status:</b></td><td><b id="status-text-${item.id_site ?? '-'}" style="color:gray">Checking...</b></td></tr>
-                    <tr><td><b>IP:</b></td><td>${item.ip_address ?? '-'}</td></tr>
-                    <tr><td><b>Alamat:</b></td><td>${item.alamat ?? '-'}</td></tr>
-                </table>
-            </div>
-        `;
-
-        marker.bindPopup(popupContent);
-        markersCoordinates.push([lat, lng]);
-      });
-
-      // 🔥 OPTIMIZED: Queue-based Status Checking dengan Concurrent Limit
-      let checkQueue = [];
-      let activeChecks = 0;
-      let isInitialCheck = true;
-      const MAX_CONCURRENT_INITIAL = 10; // Max 10 request bersamaan untuk initial check
-      const MAX_CONCURRENT_RECURRING = 3; // Max 3 request bersamaan untuk recurring
-      const CHECK_INTERVAL = 30000; // Check setiap 30 detik
-
-      function createCheckQueue(sitesData) {
-        checkQueue = sitesData.filter(site => site.ip_address).map(site => ({
-          siteId: site.id_site,
-          ipAddress: site.ip_address
-        }));
-        processCheckQueue();
-      }
-
-      function processCheckQueue() {
-        const MAX_CONCURRENT = isInitialCheck ? MAX_CONCURRENT_INITIAL : MAX_CONCURRENT_RECURRING;
-
-        while (activeChecks < MAX_CONCURRENT && checkQueue.length > 0) {
-          const site = checkQueue.shift();
-          activeChecks++;
-          performCheck(site.siteId, site.ipAddress);
-        }
-      }
-
-      function performCheck(siteId, ipAddress) {
-        const ipId = ipAddress.replace(/\./g, '-');
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
-          .then(response => response.json())
-          .then(data => {
-            clearTimeout(timeoutId);
-            updateSiteUI(siteId, ipAddress, data);
-          })
-          .catch(err => {
-            clearTimeout(timeoutId);
-            updateSiteUI(siteId, ipAddress, { status: 'unreachable', response_time: 0 });
-          })
-          .finally(() => {
-            activeChecks--;
-            processCheckQueue();
-
-            // Cek apakah initial check selesai
-            if (isInitialCheck && checkQueue.length === 0 && activeChecks === 0) {
-              isInitialCheck = false;
-            }
-          });
-      }
-
-      function updateSiteUI(siteId, ipAddress, result) {
-        const ipId = ipAddress.replace(/\./g, '-');
-        const marker = markerInstances[siteId];
-        const statusElement = document.getElementById(`status-text-${siteId}`);
-        const pingDisplay = document.getElementById(`ping-value-${ipId}`);
-        const dot = document.getElementById(`dot-${ipId}`);
-
-        let statusClass = 'status-unreachable';
-        let statusText = 'Unreachable';
-        let textColor = '#dc3545';
-        let dotClass = 'status-pill danger';
-
-        if (result.status === 'online') {
-          statusClass = 'status-online';
-          statusText = `Online (${result.response_time}ms)`;
-          textColor = '#198754';
-          dotClass = 'status-pill success';
-
-          if (pingDisplay) {
-            pingDisplay.innerText = result.response_time;
-            pingDisplay.className = 'text-success fw-bold';
-          }
-          const msLabel = document.getElementById(`ms-label-${ipId}`);
-          if (msLabel) msLabel.style.display = 'inline';
-        } else if (result.status === 'offline') {
-          statusClass = 'status-timeout';
-          statusText = 'Timeout';
-          textColor = '#ffc107';
-          dotClass = 'status-pill warning';
-
-          if (pingDisplay) {
-            pingDisplay.innerText = 'Timeout';
-            pingDisplay.className = 'text-warning';
-          }
-          const msLabel = document.getElementById(`ms-label-${ipId}`);
-          if (msLabel) msLabel.style.display = 'none';
-        } else {
-          if (pingDisplay) {
-            pingDisplay.innerText = 'Unreachable';
-            pingDisplay.className = 'text-danger';
-          }
-          const msLabel = document.getElementById(`ms-label-${ipId}`);
-          if (msLabel) msLabel.style.display = 'none';
+        function createCheckQueue(sitesData) {
+          checkQueue = sitesData.filter(site => site.ip_address).map(site => ({
+            siteId: site.id_site,
+            ipAddress: site.ip_address
+          }));
+          processCheckQueue();
         }
 
-        // Update Status di Popup jika marker ada & popup terbuka
-        if (statusElement) {
-          statusElement.innerText = statusText;
-          statusElement.style.color = textColor;
+        function processCheckQueue() {
+          const MAX_CONCURRENT = isInitialCheck ? MAX_CONCURRENT_INITIAL : MAX_CONCURRENT_RECURRING;
+
+          while (activeChecks < MAX_CONCURRENT && checkQueue.length > 0) {
+            const site = checkQueue.shift();
+            activeChecks++;
+            performCheck(site.siteId, site.ipAddress);
+          }
         }
 
-        // Update Marker Icon
-        if (marker) {
-          marker.setIcon(L.divIcon({ className: `status-icon ${statusClass}`, html: '' }));
+        function performCheck(siteId, ipAddress) {
+          const ipId = ipAddress.replace(/\./g, '-');
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-          // 🔥 Update popup content secara realtime (jika popup sedang dibuka)
-          if (marker.isPopupOpen && marker.isPopupOpen()) {
-            const popup = marker.getPopup();
-            if (popup) {
-              const statusElementInPopup = popup.getElement()?.querySelector(`[id="status-text-${siteId}"]`);
-              if (statusElementInPopup) {
-                statusElementInPopup.innerText = statusText;
-                statusElementInPopup.style.color = textColor;
+          fetch(`/api/check-status?ip=${ipAddress}&site_id=${siteId}`, { signal: controller.signal })
+            .then(response => response.json())
+            .then(data => {
+              clearTimeout(timeoutId);
+              updateSiteUI(siteId, ipAddress, data);
+            })
+            .catch(err => {
+              clearTimeout(timeoutId);
+              updateSiteUI(siteId, ipAddress, { status: 'unreachable', response_time: 0 });
+            })
+            .finally(() => {
+              activeChecks--;
+              processCheckQueue();
+
+              if (isInitialCheck && checkQueue.length === 0 && activeChecks === 0) {
+                isInitialCheck = false;
               }
-            }
-          }
+            });
         }
 
-        // Update Dot Status di Tabel
-        if (dot) {
-          dot.className = dotClass;
-        }
-      }
+        function updateSiteUI(siteId, ipAddress, result) {
+          try {
+            const ipId = ipAddress.replace(/\./g, '-');
+            const marker = markerInstances[siteId];
+            const statusElement = document.getElementById(`status-text-${siteId}`);
+            const pingDisplay = document.getElementById(`ping-value-${ipId}`);
+            const dot = document.getElementById(`dot-${ipId}`);
 
-      // 🔥 Initial check dengan concurrent limit tinggi
-      createCheckQueue(sites);
+            let statusClass = 'status-unreachable';
+            let statusText = 'Unreachable';
+            let textColor = '#dc3545';
+            let dotClass = 'status-pill danger';
 
-      // 🔥 Recurring check setiap 30 detik dengan concurrent limit rendah
-      setInterval(() => {
-        if (checkQueue.length === 0 && activeChecks === 0) {
-          createCheckQueue(sites);
-        }
-      }, CHECK_INTERVAL);
-      // =========================
-      // 🔥 AUTO FIT BOUNDS
-      // =========================
-      if (markersCoordinates.length > 0) {
-        mapHome.fitBounds(L.latLngBounds(markersCoordinates), {
-          padding: [50, 50]
-        });
-      }
+            if (result.status === 'online') {
+              statusClass = 'status-online';
+              statusText = `Online (${result.response_time}ms)`;
+              textColor = '#198754';
+              dotClass = 'status-pill success';
+              statusMap[siteId] = 'connected';
 
-      // =========================
-      // 🔥 FILTER LOGIC (INI INTI)
-      // =========================
-      const filterButtons = document.querySelectorAll('.top-nav-btn');
-      const rows = document.querySelectorAll('tbody tr');
+              if (pingDisplay) {
+                pingDisplay.innerText = result.response_time;
+                pingDisplay.className = 'text-success fw-bold';
+              }
+              const msLabel = document.getElementById(`ms-label-${ipId}`);
+              if (msLabel) msLabel.style.display = 'inline';
+            } else if (result.status === 'offline') {
+              statusClass = 'status-timeout';
+              statusText = 'Timeout';
+              textColor = '#ffc107';
+              dotClass = 'status-pill warning';
+              statusMap[siteId] = 'timeout';
 
-      filterButtons.forEach(btn => {
-        btn.addEventListener('click', function () {
-
-          // ACTIVE BUTTON
-          filterButtons.forEach(b => b.classList.remove('active'));g
-          this.classList.add('active');
-
-          const selectedKategori = this.getAttribute('data-kategori');
-
-          // =========================
-          // 🔥 FILTER TABLE
-          // =========================
-          rows.forEach(row => {
-            const kategori = row.getAttribute('data-kategori');
-
-            if (selectedKategori === 'all' || kategori ===
-              selectedKategori) {
-              row.style.display = '';
+              if (pingDisplay) {
+                pingDisplay.innerText = 'Timeout';
+                pingDisplay.className = 'text-warning';
+              }
+              const msLabel = document.getElementById(`ms-label-${ipId}`);
+              if (msLabel) msLabel.style.display = 'none';
             } else {
-              row.style.display = 'none';
+              if (pingDisplay) {
+                pingDisplay.innerText = 'Unreachable';
+                pingDisplay.className = 'text-danger';
+              }
+              const msLabel = document.getElementById(`ms-label-${ipId}`);
+              if (msLabel) msLabel.style.display = 'none';
+              statusMap[siteId] = 'unreachable';
             }
+
+            if (statusElement) {
+              statusElement.innerText = statusText;
+              statusElement.style.color = textColor;
+            }
+
+            if (marker) {
+              marker.setIcon(L.divIcon({ className: `status-icon ${statusClass}`, html: '' }));
+
+              try {
+                if (marker.isPopupOpen && marker.isPopupOpen()) {
+                  const popup = marker.getPopup();
+                  if (popup) {
+                    const popupEl = popup.getElement();
+                    if (popupEl) {
+                      const statusElementInPopup = popupEl.querySelector(`[id="status-text-${siteId}"]`);
+                      if (statusElementInPopup) {
+                        statusElementInPopup.innerText = statusText;
+                        statusElementInPopup.style.color = textColor;
+                      }
+                    }
+                  }
+                }
+              } catch (popupErr) {
+                console.warn('Popup update error:', popupErr);
+              }
+            }
+
+            if (dot) {
+              dot.className = dotClass;
+            }
+
+            // 🔥 UPDATE COUNTER SYSTEM STATUS
+            updateStatusCounters();
+          } catch (err) {
+            console.error('Error updating site UI:', err);
+          }
+        }
+
+        // 🔥 STATUS COUNTERS
+        const statusMap = {}; // siteId -> 'connected' | 'timeout' | 'unreachable'
+
+        function updateStatusCounters() {
+          let connected = 0, timeout = 0, unreachable = 0;
+          Object.values(statusMap).forEach(s => {
+            if (s === 'connected') connected++;
+            else if (s === 'timeout') timeout++;
+            else unreachable++;
           });
+          const elConnected = document.getElementById('count-connected');
+          const elTimeout = document.getElementById('count-timeout');
+          const elUnreachable = document.getElementById('count-unreachable');
+          if (elConnected) elConnected.innerText = connected;
+          if (elTimeout) elTimeout.innerText = timeout;
+          if (elUnreachable) elUnreachable.innerText = unreachable;
+        }
 
-          // =========================
-          // 🔥 FILTER MARKER
-          // =========================
-          sites.forEach(site => {
+        createCheckQueue(sites);
 
-            const marker = markerInstances[site.id_site];
-            if (!marker) return;
+        setInterval(() => {
+          try {
+            if (checkQueue.length === 0 && activeChecks === 0) {
+              createCheckQueue(sites);
+            }
+          } catch (err) {
+            console.error('Error in recurring check:', err);
+          }
+        }, CHECK_INTERVAL);
 
-            if (selectedKategori === 'all' || site.kategori ===
-              selectedKategori) {
+        if (markersCoordinates.length > 0) {
+          mapHome.fitBounds(L.latLngBounds(markersCoordinates), {
+            padding: [50, 50]
+          });
+        }
 
-              if (!mapHome.hasLayer(marker)) {
-                mapHome.addLayer(marker);
+        const filterButtons = document.querySelectorAll('.top-nav-btn');
+        const rows = document.querySelectorAll('tbody tr');
+
+        filterButtons.forEach(btn => {
+          btn.addEventListener('click', function () {
+
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const selectedKategori = this.getAttribute('data-kategori');
+
+            rows.forEach(row => {
+              const kategori = row.getAttribute('data-kategori');
+
+              if (selectedKategori === 'all' || kategori === selectedKategori) {
+                row.style.display = '';
+              } else {
+                row.style.display = 'none';
+              }
+            });
+
+            sites.forEach(site => {
+
+              const marker = markerInstances[site.id_site];
+              if (!marker) return;
+
+              if (selectedKategori === 'all' || site.kategori === selectedKategori) {
+
+                if (!mapHome.hasLayer(marker)) {
+                  mapHome.addLayer(marker);
+                }
+
+              } else {
+
+                if (mapHome.hasLayer(marker)) {
+                  mapHome.removeLayer(marker);
+                }
               }
 
-            } else {
+            });
 
-              if (mapHome.hasLayer(marker)) {
-                mapHome.removeLayer(marker);
-              }
-            }
           });
-
         });
-      });
 
-      // =========================
-      // 🔥 MAP INTERACTION CONTROL (BIAR GA KEGESER)
-      // =========================
-      const mapContainer = document.getElementById('map-home');
-      const overlay = document.getElementById('map-overlay');
+        const mapContainer = document.getElementById('map-home');
+        const overlay = document.getElementById('map-overlay');
 
-      function enableMap() {
-        mapHome.scrollWheelZoom.enable();
-        mapHome.dragging.enable();
-        mapHome.touchZoom.enable();
-        mapHome.doubleClickZoom.enable();
-        mapHome.boxZoom.enable();
-        mapHome.keyboard.enable();
+        function enableMap() {
+          try {
+            mapHome.scrollWheelZoom.enable();
+            mapHome.dragging.enable();
+            mapHome.touchZoom.enable();
+            mapHome.doubleClickZoom.enable();
+            mapHome.boxZoom.enable();
+            mapHome.keyboard.enable();
+          } catch (e) {
+            console.warn('Error enabling map controls:', e);
+          }
+        }
+
+        function disableMap() {
+          try {
+            mapHome.scrollWheelZoom.disable();
+            mapHome.dragging.disable();
+            mapHome.touchZoom.disable();
+            mapHome.doubleClickZoom.disable();
+            mapHome.boxZoom.disable();
+            mapHome.keyboard.disable();
+          } catch (e) {
+            console.warn('Error disabling map controls:', e);
+          }
+        }
+
+        overlay.addEventListener('click', () => {
+          overlay.style.display = 'none';
+          enableMap();
+        });
+
+        mapContainer.addEventListener('mouseleave', () => {
+          disableMap();
+          overlay.style.display = 'flex';
+        });
+
+        setTimeout(() => {
+          try {
+            mapHome.invalidateSize();
+          } catch (e) {
+            console.warn('Error invalidating map size:', e);
+          }
+        }, 300);
+
+      } catch (err) {
+        console.error('Fatal error in map initialization:', err);
       }
 
-      function disableMap() {
-        mapHome.scrollWheelZoom.disable();
-        mapHome.dragging.disable();
-        mapHome.touchZoom.disable();
-        mapHome.doubleClickZoom.disable();
-        mapHome.boxZoom.disable();
-        mapHome.keyboard.disable();
-      }
-
-      overlay.addEventListener('click', () => {
-        overlay.style.display = 'none';
-        enableMap();
-      });
-
-      mapContainer.addEventListener('mouseleave', () => {
-        disableMap();
-        overlay.style.display = 'flex';
-      });
-
-      // FIX RENDER
-      setTimeout(() => {
-        mapHome.invalidateSize();
-      }, 300);
-
-    });
-
-    // Delete Site dengan SweetAlert2 dan Fetch API
+    });    // Delete Site dengan SweetAlert2 dan Fetch API
     document.addEventListener('DOMContentLoaded', function () {
       // Gunakan event delegation supaya lebih aman jika ada penambahan baris dinamis
       document.addEventListener('click', function (e) {
@@ -1750,42 +1846,48 @@
         }).then((result) => {
 
           if (result.isConfirmed) {
+            try {
+              // 🔥 INI YANG BIKIN REALTIME HILANG DARI PETA
+              if (markerInstances[idSite]) {
+                console.log("Marker ditemukan, menghapus dari peta...");
 
-            // 🔥 INI YANG BIKIN REALTIME HILANG DARI PETA
-            if (markerInstances[idSite]) {
-              console.log("Marker ditemukan, menghapus dari peta...");
+                // Hapus dari tampilan peta
+                if (mapHome && mapHome.hasLayer(markerInstances[idSite])) {
+                  mapHome.removeLayer(markerInstances[idSite]);
+                }
 
-              // Hapus dari tampilan peta
-              mapHome.removeLayer(markerInstances[idSite]);
+                // Hapus dari daftar memori
+                delete markerInstances[idSite];
+              }
 
-              // Hapus dari daftar memori
-              delete markerInstances[idSite];
+              // Hentikan monitoring IP agar tidak error di console
+              if (activeIntervals[idSite]) {
+                clearInterval(activeIntervals[idSite]);
+                delete activeIntervals[idSite];
+              }
+
+              // Hapus baris tabel secara realtime
+              if (targetRow) {
+                targetRow.style.transition = "all 0.5s ease";
+                targetRow.style.opacity = "0";
+                targetRow.style.transform = "translateX(50px)";
+                setTimeout(() => targetRow.remove(), 500);
+              }
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Terhapus!',
+                timer: 1000,
+                showConfirmButton: false
+              });
+            } catch (err) {
+              console.error('Error deleting site:', err);
+              Swal.fire('Error!', 'Terjadi kesalahan saat menghapus: ' + err.message, 'error');
             }
-
-            // Hentikan monitoring IP agar tidak error di console
-            if (activeIntervals[idSite]) {
-              clearInterval(activeIntervals[idSite]);
-              delete activeIntervals[idSite];
-            }
-
-            // Hapus baris tabel secara realtime
-            if (targetRow) {
-              targetRow.style.transition = "all 0.5s ease";
-              targetRow.style.opacity = "0";
-              targetRow.style.transform = "translateX(50px)";
-              setTimeout(() => targetRow.remove(), 500);
-            }
-
-            Swal.fire({
-              icon: 'success',
-              title: 'Terhapus!',
-              timer: 1000,
-              showConfirmButton: false
-            });
           }
         });
       });
-    }); // Realtime Status Check JS
+    }, { once: true }); // 🔥 { once: true } untuk mencegah multiple listener // Realtime Status Check JS
 
 
     // realtime clock js
@@ -1893,7 +1995,169 @@
         }, 300);
       });
     });
+
+    // ===== DOWNTIME LOGS FUNCTIONALITY =====
+    document.addEventListener('DOMContentLoaded', function () {
+      // Handle View Logs Button
+      const viewLogsButtons = document.querySelectorAll('.btn-view-logs');
+
+      viewLogsButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const siteId = this.dataset.id;
+          const ipAddress = this.dataset.ip;
+
+          loadDowntimeLogs(siteId, ipAddress);
+        });
+      });
+    });
+
+    function loadDowntimeLogs(siteId, ipAddress) {
+      const logsTableBody = document.getElementById('logsTableBody');
+      const siteInfoSpan = document.getElementById('siteInfoSpan');
+
+      // Update header
+      siteInfoSpan.textContent = `${ipAddress}`;
+
+      // Set download button site id
+      document.getElementById('btnDownloadLogs').dataset.siteId = siteId;
+
+      // Show loading
+      logsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-info"><i class="ph ph-spinner-gap spinning"></i> Loading logs...</td></tr>';
+
+      // Fetch logs
+      fetch(`/api/downtime-logs/${siteId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success' && data.data.length > 0) {
+            let html = '';
+            data.data.forEach(log => {
+              const recoveredAt = log.recovered_at === 'Belum Recover' ?
+                '<span class="badge bg-warning">On Going</span>' :
+                log.recovered_at;
+
+              html += `<tr>
+                <td class="text-white small">${log.projek}</td>
+                <td class="text-white font-monospace small">${log.ip_address}</td>
+                <td class="text-center"><span class="badge ${log.status === 'offline' ? 'bg-danger' : 'bg-warning'}">${log.status.toUpperCase()}</span></td>
+                <td class="text-white small">${log.down_at}</td>
+                <td class="text-white small">${recoveredAt}</td>
+                <td class="text-white text-center small">${log.durasi_menit !== '-' ? log.durasi_menit + ' min' : '-'}</td>
+              </tr>`;
+            });
+            logsTableBody.innerHTML = html;
+          } else {
+            logsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No downtime logs found</td></tr>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading logs:', error);
+          logsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading logs</td></tr>';
+        });
+    }
+
+    function downloadDowntimeLogs() {
+      const siteId = document.getElementById('btnDownloadLogs').dataset.siteId;
+      const startDate = document.getElementById('filterStartDate').value;
+      const endDate = document.getElementById('filterEndDate').value;
+
+      let url = `/api/downtime-logs-download?site_id=${siteId}`;
+
+      if (startDate) {
+        url += `&start_date=${startDate}`;
+      }
+      if (endDate) {
+        url += `&end_date=${endDate}`;
+      }
+
+      // Create hidden link and click it
+      const link = document.createElement('a');
+      link.href = url;
+      link.click();
+    }
+
+    // Add spinning animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .spinning {
+        animation: spin 2s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
+
+  <!-- MODAL DOWNTIME LOGS -->
+  <div class="modal fade" id="modalDowntimeLogs" tabindex="-1" aria-labelledby="modalDowntimeLogsLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content" style="background-color: #1a1a2e; border: 1px solid #333;">
+        <div class="modal-header border-bottom" style="border-color: #333;">
+          <div>
+            <h5 class="modal-title text-white" id="modalDowntimeLogsLabel">
+              <i class="ph ph-list me-2"></i>Downtime Logs
+            </h5>
+            <small class="text-muted">IP: <span id="siteInfoSpan" class="text-info font-monospace">-</span></small>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Filters -->
+          <div class="row mb-3 pb-3" style="border-bottom: 1px solid #333;">
+            <div class="col-md-5">
+              <label class="form-label text-white small">Start Date</label>
+              <input type="date" id="filterStartDate" class="form-control form-control-sm"
+                style="background-color: #222; border-color: #444; color: white;">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label text-white small">End Date</label>
+              <input type="date" id="filterEndDate" class="form-control form-control-sm"
+                style="background-color: #222; border-color: #444; color: white;">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-sm btn-info w-100"
+                onclick="loadDowntimeLogs(document.getElementById('btnDownloadLogs').dataset.siteId, document.getElementById('siteInfoSpan').textContent)">
+                <i class="ph ph-funnel me-1"></i>Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- Logs Table -->
+          <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-dark table-hover mb-0" style="font-size: 12px;">
+              <thead style="position: sticky; top: 0; background-color: #222;">
+                <tr>
+                  <th class="text-white">Project</th>
+                  <th class="text-white">IP Address</th>
+                  <th class="text-center text-white">Status</th>
+                  <th class="text-white">Down At</th>
+                  <th class="text-white">Recovered At</th>
+                  <th class="text-center text-white">Duration</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top" style="border-color: #333;">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="btnDownloadLogs" class="btn btn-success btn-sm" onclick="downloadDowntimeLogs()">
+            <i class="ph ph-download me-1"></i>Download CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>

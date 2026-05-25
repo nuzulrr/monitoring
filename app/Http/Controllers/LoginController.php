@@ -19,7 +19,7 @@ class LoginController extends Controller
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
@@ -34,17 +34,17 @@ class LoginController extends Controller
     }
 
     // Proses Register (Opsional)
-    
-public function showRegisterForm()
-{
-    return view('auth.register');
-}
+
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
     public function register(Request $request)
     {
         // Gabungkan validasi standar dan validasi Secret Code dari .env
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'secret_code' => [
                 'required',
@@ -59,8 +59,8 @@ public function showRegisterForm()
 
         // Jika validasi lolos, buat user baru
         User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
@@ -73,8 +73,8 @@ public function showRegisterForm()
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect('/login');
     }
-    
+
 }

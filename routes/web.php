@@ -22,17 +22,21 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'authenticate']);
     Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register.form');
     // Opsional: Jika kamu butuh register
-     Route::post('/register', [LoginController::class, 'register'])->name('register');
+    Route::post('/register', [LoginController::class, 'register'])->name('register');
 });
 
 // 3. Auth Only: Harus login untuk akses dashboard dan data
 Route::middleware('auth')->group(function () {
-    
+
     // Dashboard & Home
     Route::get('/home', [SiteController::class, 'index'])->name('home');
-    
+
     // Monitoring API
     Route::get('/api/check-status', [SiteController::class, 'checkStatus'])->name('check.status');
+
+    // Downtime Logs API
+    Route::get('/api/downtime-logs/{id_site}', [SiteController::class, 'getDowntimeLogs'])->name('downtime.logs');
+    Route::get('/api/downtime-logs-download', [SiteController::class, 'downloadDowntimeLogs'])->name('downtime.download');
 
     // Data Management (Projek & Site)
     Route::post('/projek', [ProjekController::class, 'store'])->name('projek.store');
@@ -44,5 +48,5 @@ Route::middleware('auth')->group(function () {
     Route::put('/projek/{id}', [ProjekController::class, 'update'])->name('projek.update');
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    
+
 });
