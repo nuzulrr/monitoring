@@ -56,6 +56,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
+
 <body data-pc-theme="dark">
   <div class="loader-bg">
     <div class="loader-track">
@@ -119,11 +120,19 @@
             <button type="button" class="top-nav-btn" data-kategori="3">Loreng</button>
           </div>
           <div class="ms-2 ps-3 d-flex">
-            <button type="button" class="btn btn-success btn-add-action me-2" data-bs-toggle="modal"
-              data-bs-target="#modalLokasi">
-              Add Site
-            </button>
 
+            <button type="button" class="button me-2 mb-2" data-bs-toggle="modal" data-bs-target="#modalLokasi">
+
+              <span class="button__text">Add Site</span>
+              <span class="button__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none"
+                  class="svg">
+                  <line y2="19" y1="5" x2="12" x1="12"></line>
+                  <line y2="12" y1="12" x2="19" x1="5"></line>
+                </svg>
+              </span>
+            </button>
             <!-- MODAL TAMBAH SITE -->
             <div class="modal fade" id="modalLokasi" tabindex="-1">
               <div class="modal-dialog modal-lg">
@@ -303,8 +312,15 @@
                 </div>
               </div>
             </div>
-            <button type="button" class="btn-add-action" data-bs-toggle="modal" data-bs-target="#modalProjek">
-              <i class=" me-1"></i> Add Project
+
+            <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#modalProjek">
+              <span class="button__text">Add Project</span>
+              <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24"
+                  stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24"
+                  fill="none" class="svg">
+                  <line y2="19" y1="5" x2="12" x1="12"></line>
+                  <line y2="12" y1="12" x2="19" x1="5"></line>
+                </svg></span>
             </button>
           </div>
         </div>
@@ -370,7 +386,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                                    success ') }}',
+                                      success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -428,7 +444,7 @@
 
           <!-- 🔥 LIVE IP MONITORING (BESAR) -->
           <div class="col-xl-9 col-lg-8">
-            <div class="card card-dark-custom mb-4 h-100">
+            <div class="card card-dark-custom mb-4" style="height: auto; display: flex; flex-direction: column;">
               <div class="card-header border-0 pb-1 d-flex justify-content-between align-items-center">
                 <h5 class="text-white mb-0 d-flex align-items-center">
                   <i class="ph ph-monitor text-danger me-2 f-20"></i> Live IP Monitoring
@@ -480,9 +496,9 @@
 
               </script>
 
-              <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                  <table class="table table-ip mb-0">
+              <div class="card-body p-0" style="overflow-x: auto; max-height: none;">
+                <div style="display: block; overflow: visible;">
+                  <table class="table table-ip mb-0" style="width: 100%; margin-bottom: 0;">
                     <thead>
                       <tr class="text-center">
                         <th>Project</th>
@@ -543,6 +559,11 @@
 
                           <td class="text-center">
                             <div class="btn-group btn-group-sm">
+                              <button type="button" class="btn btn-outline-info border-0 btn-view-logs"
+                                data-id="{{ $s->id_site }}" data-ip="{{ $s->ip_address }}" data-bs-toggle="modal"
+                                data-bs-target="#modalDowntimeLogs" title="View Downtime Logs">
+                                <i class="ph ph-list"></i>
+                              </button>
                               <button type="button" class="btn btn-outline-primary border-0 btn-edit"
                                 data-id="{{ $s->id_site }}" data-projek_id="{{ $s->id_projek }}"
                                 data-projek_val="{{ $s->projek }}" data-ip="{{ $s->ip_address }}"
@@ -661,29 +682,44 @@
           <div class="col-xl-3 col-lg-4">
             <div class="card border-0 mb-3" style="background-color: #f8f9fa; border-radius: 12px;">
               <div class="card-body text-center p-3">
-                <h6 class="text-dark fw-bold mb-3 d-flex align-items-center justify-content-center"
+                <h6 class="text-dark fw-bold mb-4 d-flex align-items-center justify-content-center"
                   style="font-size: 14px;">
                   <span class="bg-danger me-2" style="width: 4px; height: 14px; border-radius: 2px;"></span>
                   System Status
                 </h6>
-                <div class="d-flex justify-content-around">
-                  <div>
-                    <div class="status-ring ring-success mb-1" style="width: 30px; height: 30px;">
+                <div class="d-flex justify-content-between gap-2" style="margin-bottom: 2rem;">
+                  <!-- Connected -->
+                  <div class="d-flex flex-column align-items-center flex-grow-1">
+                    <div class="status-ring ring-success mb-2" style="width: 40px; height: 40px;">
                       <div class="status-dot dot-success"></div>
                     </div>
-                    <span class="text-success fw-bold" style="font-size: 10px;">Connect</span>
+                    <span class="text-success fw-bold"
+                      style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Connected</span>
+                    <span id="count-connected" class="fw-bold mt-2"
+                      style="font-size: 24px; color: #198754; line-height: 1; font-weight: 700;">0</span>
+                    <span class="text-muted" style="font-size: 9px;">sites</span>
                   </div>
-                  <div>
-                    <div class="status-ring ring-warning mb-1" style="width: 30px; height: 30px;">
+                  <!-- Timeout -->
+                  <div class="d-flex flex-column align-items-center flex-grow-1">
+                    <div class="status-ring ring-warning mb-2" style="width: 40px; height: 40px;">
                       <div class="status-dot dot-warning"></div>
                     </div>
-                    <span class="text-warning fw-bold" style="font-size: 10px;">Timeout</span>
+                    <span class="text-warning fw-bold"
+                      style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Timeout</span>
+                    <span id="count-timeout" class="fw-bold mt-2"
+                      style="font-size: 24px; color: #ffc107; line-height: 1; font-weight: 700;">0</span>
+                    <span class="text-muted" style="font-size: 9px;">sites</span>
                   </div>
-                  <div>
-                    <div class="status-ring ring-danger mb-1" style="width: 30px; height: 30px;">
+                  <!-- Unreachable -->
+                  <div class="d-flex flex-column align-items-center flex-grow-1">
+                    <div class="status-ring ring-danger mb-2" style="width: 40px; height: 40px;">
                       <div class="status-dot dot-danger"></div>
                     </div>
-                    <span class="text-danger fw-bold" style="font-size: 10px;">Unreachable</span>
+                    <span class="text-danger fw-bold"
+                      style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Unreachable</span>
+                    <span id="count-unreachable" class="fw-bold mt-2"
+                      style="font-size: 24px; color: #dc3545; line-height: 1; font-weight: 700;">0</span>
+                    <span class="text-muted" style="font-size: 9px;">sites</span>
                   </div>
                 </div>
               </div>
@@ -1525,7 +1561,7 @@
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-          fetch(`/api/check-status?ip=${ipAddress}`, { signal: controller.signal })
+          fetch(`/api/check-status?ip=${ipAddress}&site_id=${siteId}`, { signal: controller.signal })
             .then(response => response.json())
             .then(data => {
               clearTimeout(timeoutId);
@@ -1563,6 +1599,7 @@
               statusText = `Online (${result.response_time}ms)`;
               textColor = '#198754';
               dotClass = 'status-pill success';
+              statusMap[siteId] = 'connected';
 
               if (pingDisplay) {
                 pingDisplay.innerText = result.response_time;
@@ -1575,6 +1612,7 @@
               statusText = 'Timeout';
               textColor = '#ffc107';
               dotClass = 'status-pill warning';
+              statusMap[siteId] = 'timeout';
 
               if (pingDisplay) {
                 pingDisplay.innerText = 'Timeout';
@@ -1589,6 +1627,7 @@
               }
               const msLabel = document.getElementById(`ms-label-${ipId}`);
               if (msLabel) msLabel.style.display = 'none';
+              statusMap[siteId] = 'unreachable';
             }
 
             if (statusElement) {
@@ -1621,9 +1660,30 @@
             if (dot) {
               dot.className = dotClass;
             }
+
+            // 🔥 UPDATE COUNTER SYSTEM STATUS
+            updateStatusCounters();
           } catch (err) {
             console.error('Error updating site UI:', err);
           }
+        }
+
+        // 🔥 STATUS COUNTERS
+        const statusMap = {}; // siteId -> 'connected' | 'timeout' | 'unreachable'
+
+        function updateStatusCounters() {
+          let connected = 0, timeout = 0, unreachable = 0;
+          Object.values(statusMap).forEach(s => {
+            if (s === 'connected') connected++;
+            else if (s === 'timeout') timeout++;
+            else unreachable++;
+          });
+          const elConnected = document.getElementById('count-connected');
+          const elTimeout = document.getElementById('count-timeout');
+          const elUnreachable = document.getElementById('count-unreachable');
+          if (elConnected) elConnected.innerText = connected;
+          if (elTimeout) elTimeout.innerText = timeout;
+          if (elUnreachable) elUnreachable.innerText = unreachable;
         }
 
         createCheckQueue(sites);
@@ -1935,7 +1995,169 @@
         }, 300);
       });
     });
+
+    // ===== DOWNTIME LOGS FUNCTIONALITY =====
+    document.addEventListener('DOMContentLoaded', function () {
+      // Handle View Logs Button
+      const viewLogsButtons = document.querySelectorAll('.btn-view-logs');
+
+      viewLogsButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const siteId = this.dataset.id;
+          const ipAddress = this.dataset.ip;
+
+          loadDowntimeLogs(siteId, ipAddress);
+        });
+      });
+    });
+
+    function loadDowntimeLogs(siteId, ipAddress) {
+      const logsTableBody = document.getElementById('logsTableBody');
+      const siteInfoSpan = document.getElementById('siteInfoSpan');
+
+      // Update header
+      siteInfoSpan.textContent = `${ipAddress}`;
+
+      // Set download button site id
+      document.getElementById('btnDownloadLogs').dataset.siteId = siteId;
+
+      // Show loading
+      logsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-info"><i class="ph ph-spinner-gap spinning"></i> Loading logs...</td></tr>';
+
+      // Fetch logs
+      fetch(`/api/downtime-logs/${siteId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success' && data.data.length > 0) {
+            let html = '';
+            data.data.forEach(log => {
+              const recoveredAt = log.recovered_at === 'Belum Recover' ?
+                '<span class="badge bg-warning">On Going</span>' :
+                log.recovered_at;
+
+              html += `<tr>
+                <td class="text-white small">${log.projek}</td>
+                <td class="text-white font-monospace small">${log.ip_address}</td>
+                <td class="text-center"><span class="badge ${log.status === 'offline' ? 'bg-danger' : 'bg-warning'}">${log.status.toUpperCase()}</span></td>
+                <td class="text-white small">${log.down_at}</td>
+                <td class="text-white small">${recoveredAt}</td>
+                <td class="text-white text-center small">${log.durasi_menit !== '-' ? log.durasi_menit + ' min' : '-'}</td>
+              </tr>`;
+            });
+            logsTableBody.innerHTML = html;
+          } else {
+            logsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No downtime logs found</td></tr>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading logs:', error);
+          logsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading logs</td></tr>';
+        });
+    }
+
+    function downloadDowntimeLogs() {
+      const siteId = document.getElementById('btnDownloadLogs').dataset.siteId;
+      const startDate = document.getElementById('filterStartDate').value;
+      const endDate = document.getElementById('filterEndDate').value;
+
+      let url = `/api/downtime-logs-download?site_id=${siteId}`;
+
+      if (startDate) {
+        url += `&start_date=${startDate}`;
+      }
+      if (endDate) {
+        url += `&end_date=${endDate}`;
+      }
+
+      // Create hidden link and click it
+      const link = document.createElement('a');
+      link.href = url;
+      link.click();
+    }
+
+    // Add spinning animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .spinning {
+        animation: spin 2s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
+
+  <!-- MODAL DOWNTIME LOGS -->
+  <div class="modal fade" id="modalDowntimeLogs" tabindex="-1" aria-labelledby="modalDowntimeLogsLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content" style="background-color: #1a1a2e; border: 1px solid #333;">
+        <div class="modal-header border-bottom" style="border-color: #333;">
+          <div>
+            <h5 class="modal-title text-white" id="modalDowntimeLogsLabel">
+              <i class="ph ph-list me-2"></i>Downtime Logs
+            </h5>
+            <small class="text-muted">IP: <span id="siteInfoSpan" class="text-info font-monospace">-</span></small>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Filters -->
+          <div class="row mb-3 pb-3" style="border-bottom: 1px solid #333;">
+            <div class="col-md-5">
+              <label class="form-label text-white small">Start Date</label>
+              <input type="date" id="filterStartDate" class="form-control form-control-sm"
+                style="background-color: #222; border-color: #444; color: white;">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label text-white small">End Date</label>
+              <input type="date" id="filterEndDate" class="form-control form-control-sm"
+                style="background-color: #222; border-color: #444; color: white;">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-sm btn-info w-100"
+                onclick="loadDowntimeLogs(document.getElementById('btnDownloadLogs').dataset.siteId, document.getElementById('siteInfoSpan').textContent)">
+                <i class="ph ph-funnel me-1"></i>Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- Logs Table -->
+          <div style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-dark table-hover mb-0" style="font-size: 12px;">
+              <thead style="position: sticky; top: 0; background-color: #222;">
+                <tr>
+                  <th class="text-white">Project</th>
+                  <th class="text-white">IP Address</th>
+                  <th class="text-center text-white">Status</th>
+                  <th class="text-white">Down At</th>
+                  <th class="text-white">Recovered At</th>
+                  <th class="text-center text-white">Duration</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top" style="border-color: #333;">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="btnDownloadLogs" class="btn btn-success btn-sm" onclick="downloadDowntimeLogs()">
+            <i class="ph ph-download me-1"></i>Download CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
