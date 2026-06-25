@@ -386,7 +386,7 @@
             icon: 'success',
             title: 'Berhasil!',
             text: '{{ session('
-                                      success ') }}',
+                                          success ') }}',
             timer: 2000,
             showConfirmButton: false
           });
@@ -2162,6 +2162,17 @@
   <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
+  <script>
+    function shouldAutoReload() {
+      return !document.querySelector('.modal.show') && !document.hidden;
+    }
+
+    setInterval(function () {
+      if (shouldAutoReload()) {
+        location.reload();
+      }
+    }, 10000);
+  </script>
 </body>
 
 </html>
